@@ -4,23 +4,20 @@ from xml.dom import minidom
 from openpyxl import load_workbook, workbook
 #from openpyxl import workbook
 
-wb = load_workbook(filename='./xml/excel/work_2.xlsx', data_only=True)
+wb = load_workbook(filename="./excel/10_08-2017.xlsx", data_only=True)
 ws = wb.active
 
-names = tuple(ws.iter_rows(min_row=1, min_col=2,
-                           max_row=ws.max_row, max_col=2, values_only=True))
-quants = tuple(ws.iter_rows(min_row=1, min_col=4,
-                            max_row=ws.max_row, max_col=4, values_only=True))
-summs = tuple(ws.iter_rows(min_row=1, min_col=3,
-                           max_row=ws.max_row, max_col=3, values_only=True))
-wb.close
+names = ws.iter_rows(min_row=1, min_col=2, max_row=ws.max_row, max_col=2, values_only=True)
+quants = ws.iter_rows(min_row=1, min_col=4, max_row=ws.max_row, max_col=4, values_only=True)
+summs = ws.iter_rows(min_row=1, min_col=3, max_row=ws.max_row, max_col=3, values_only=True)
+wb.close()
 
+th_names = [item for sublist in names for item in sublist]
+new_names = list(map(str, th_names))
 th_quants = [item for sublist in quants for item in sublist]
 new_quants = list(map(float, th_quants))
 th_summs = [item for sublist in summs for item in sublist]
 new_summs = list(map(float, th_summs))
-th_names = [item for sublist in names for item in sublist]
-new_names = list(map(str, th_names))
 
 # создаём объект
 doc = minidom.Document()
@@ -45,7 +42,7 @@ root1.appendChild(root2)
 # root4.appendChild(root5)
 
 i = 0
-while i < len(names):
+while i < len(new_names):
     # print(user[i])
     if i < 9:
         obosn = ('СЦЕН-МТ-00'+str(i+1))
