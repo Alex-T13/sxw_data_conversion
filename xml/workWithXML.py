@@ -51,9 +51,9 @@ while i < len(new_names):
     else:
         obosn = ('СЦЕН-МТ-'+str(i+1))
 
-    mat = round(new_summs[i] / new_quants[i], 0)
-    tr = round(mat * 0.096, 0)
-    cena_0 = round(mat + tr, 0)
+    mat = round(new_summs[i] / new_quants[i], 5)
+    tr = round(mat * 0.096, 2)
+    cena_0 = round(mat + tr, 2)
 
     # первый блок rascenka
     rascenka = doc.createElement('rascenka')
@@ -105,9 +105,8 @@ while i < len(new_names):
     # stoimost
     stoimost = doc.createElement('stoimost')
     stoimost.setAttribute('mat', str(new_summs[i]))
-    stoimost.setAttribute('tr', str(round(tr*new_quants[i], 0)))
-    stoimost.setAttribute('pryam', str(
-        round(tr*new_quants[i]+new_summs[i], 0)))
+    stoimost.setAttribute('tr', str(round(tr*new_quants[i], 2)))
+    stoimost.setAttribute('pryam', str(round(tr*new_quants[i]+new_summs[i], 2)))
     stoimost.setAttribute('ohr', '0')
     stoimost.setAttribute('pp', '0')
     rascenka.appendChild(stoimost)
@@ -125,7 +124,7 @@ while i < len(new_names):
     resurs.setAttribute('norma', '1')  # klv
     resurs.setAttribute('klv', str(new_quants[i]))
     resurs.setAttribute('cena_0', str(mat))
-    resurs.setAttribute('stm_0', str(round(mat*new_quants[i], 0)))
+    resurs.setAttribute('stm_0', str(round(mat*new_quants[i], 2)))
     resurs.setAttribute('tr', str(tr))
     resurs.setAttribute('tr_rub', '0')
     resurs.setAttribute('cena_tr', '9,6')
