@@ -1,28 +1,38 @@
 from openpyxl import Workbook
 from openpyxl import load_workbook
 
-wb = load_workbook(filename="10_08-2017.xlsx", data_only=True)
+wb = load_workbook(filename="08_10-2019-!.xlsx", data_only=True)
 ws = wb.active
 
-names = ws.iter_rows(min_row=1, min_col=2, max_row=ws.max_row, max_col=2, values_only=True)
-quants = ws.iter_rows(min_row=1, min_col=4, max_row=ws.max_row, max_col=4, values_only=True)
-summs = ws.iter_rows(min_row=1, min_col=3, max_row=ws.max_row, max_col=3, values_only=True)
+names = ws.iter_rows(min_row=1, min_col=1, max_row=ws.max_row, max_col=1, values_only=True)
+quants = ws.iter_rows(min_row=1, min_col=3, max_row=ws.max_row, max_col=3, values_only=True)
+summs = ws.iter_rows(min_row=1, min_col=2, max_row=ws.max_row, max_col=2, values_only=True)
 wb.close()
 
 print(type(summs))
 
+
+
 th_names = [item for sublist in names for item in sublist]
-new_names = list(map(str, th_names))
 th_quants = [item for sublist in quants for item in sublist]
-new_quants = list(map(float, th_quants))
 th_summs = [item for sublist in summs for item in sublist]
-#th_summs = [summs]
 
 print(type(th_summs))
 
-new_summs = list(map(float, th_summs))
+print(th_summs)
 
-print(type(new_summs))
+new1_names = [i for i in th_names if i % 4 == 0]
+new1_quants = [i for i in th_quants if i % 4 == 0]
+new1_summs = [i for i in th_summs if i % 4 == 0]
+
+print(new1_summs)
+
+new_names = list(map(str, new1_names))
+new_quants = list(map(float, new1_quants))
+new_summs = list(map(float, new1_summs))
+
+
+#print(type(new_summs))
 
 #print(names, len(names))
 #print(quants, len(quants))
@@ -31,6 +41,7 @@ print(type(new_summs))
 #new_quants = list(map(int, quants))
 #new_summs = list(map(float, summs))
 print(new_summs, len(new_summs))
+print(new_names, len(new_names))
 
 i = 0
 while i < 10: #len(names):

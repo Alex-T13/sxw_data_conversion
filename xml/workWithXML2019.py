@@ -14,6 +14,8 @@ wb.close()
 
 th_names = [item for sublist in names for item in sublist]
 new_names = list(map(str, th_names))
+#new_names = [i for i in new1_names]
+#b = [i for i in a if i % 2 == 0]
 th_quants = [item for sublist in quants for item in sublist]
 new_quants = list(map(float, th_quants))
 th_summs = [item for sublist in summs for item in sublist]
