@@ -11,21 +11,28 @@ wb.close()
 
 print(type(summs))
 
-
-
 th_names = [item for sublist in names for item in sublist]
 th_quants = [item for sublist in quants for item in sublist]
 th_summs = [item for sublist in summs for item in sublist]
 
 print(type(th_summs))
+#print(th_summs)
 
-print(th_summs)
+new1_names = []
+new1_quants = []
+new1_summs = []
 
-new1_names = [i for i in th_names if i % 4 == 0]
-new1_quants = [i for i in th_quants if i % 4 == 0]
-new1_summs = [i for i in th_summs if i % 4 == 0]
+i=3
+while i < len(th_names):
+    #x = th_quants [5]
+    new1_names.append(th_names[i])
+    new1_quants.append(th_quants[i])
+    new1_summs.append(th_summs[i])
+    i += 4
 
-print(new1_summs)
+
+
+#print(new1_summs)
 
 new_names = list(map(str, new1_names))
 new_quants = list(map(float, new1_quants))
