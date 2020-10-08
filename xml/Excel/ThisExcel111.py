@@ -9,13 +9,13 @@ quants = ws.iter_rows(min_row=1, min_col=3, max_row=ws.max_row, max_col=3, value
 summs = ws.iter_rows(min_row=1, min_col=2, max_row=ws.max_row, max_col=2, values_only=True)
 wb.close()
 
-print(type(summs))
+#print(type(summs))
 
 th_names = [item for sublist in names for item in sublist]
 th_quants = [item for sublist in quants for item in sublist]
 th_summs = [item for sublist in summs for item in sublist]
 
-print(type(th_summs))
+#print(type(th_summs))
 #print(th_summs)
 
 new1_names = []

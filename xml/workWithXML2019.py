@@ -4,22 +4,35 @@ from xml.dom import minidom
 from openpyxl import load_workbook, workbook
 #from openpyxl import workbook
 
-wb = load_workbook(filename="./excel/10_08-2018.xlsx", data_only=True)
+wb = load_workbook(filename="./excel/08_10-2020-6.xlsx", data_only=True)
 ws = wb.active
 
-names = ws.iter_rows(min_row=1, min_col=2, max_row=ws.max_row, max_col=2, values_only=True)
-quants = ws.iter_rows(min_row=1, min_col=4, max_row=ws.max_row, max_col=4, values_only=True)
+names = ws.iter_rows(min_row=1, min_col=1, max_row=ws.max_row, max_col=1, values_only=True)
+quants = ws.iter_rows(min_row=1, min_col=2, max_row=ws.max_row, max_col=2, values_only=True)
 summs = ws.iter_rows(min_row=1, min_col=3, max_row=ws.max_row, max_col=3, values_only=True)
 wb.close()
 
 th_names = [item for sublist in names for item in sublist]
-new_names = list(map(str, th_names))
-#new_names = [i for i in new1_names]
-#b = [i for i in a if i % 2 == 0]
 th_quants = [item for sublist in quants for item in sublist]
-new_quants = list(map(float, th_quants))
 th_summs = [item for sublist in summs for item in sublist]
-new_summs = list(map(float, th_summs))
+
+new1_names = []
+new1_quants = []
+new1_summs = []
+
+i=3
+while i < len(th_names):
+    new1_names.append(th_names[i])
+    new1_quants.append(th_quants[i])
+    new1_summs.append(th_summs[i])
+    i += 4
+
+#th_names = [item for sublist in names for item in sublist]
+new_names = list(map(str, new1_names))
+#th_quants = [item for sublist in quants for item in sublist]
+new_quants = list(map(float, new1_quants))
+#th_summs = [item for sublist in summs for item in sublist]
+new_summs = list(map(float, new1_summs))
 
 # создаём объект
 doc = minidom.Document()
@@ -107,8 +120,8 @@ while i < len(new_names):
     # stoimost
     stoimost = doc.createElement('stoimost')
     stoimost.setAttribute('mat', str(new_summs[i]))
-    stoimost.setAttribute('tr', str(round(tr*new_quants[i], 2)))
-    stoimost.setAttribute('pryam', str(round(tr*new_quants[i]+new_summs[i], 2)))
+    stoimost.setAttribute('tr', str(round(tr * new_quants[i], 2)))
+    stoimost.setAttribute('pryam', str(round(tr * new_quants[i] + new_summs[i], 2)))
     stoimost.setAttribute('ohr', '0')
     stoimost.setAttribute('pp', '0')
     rascenka.appendChild(stoimost)
@@ -126,7 +139,7 @@ while i < len(new_names):
     resurs.setAttribute('norma', '1')  # klv
     resurs.setAttribute('klv', str(new_quants[i]))
     resurs.setAttribute('cena_0', str(mat))
-    resurs.setAttribute('stm_0', str(round(mat*new_quants[i], 2)))
+    resurs.setAttribute('stm_0', str(round(mat * new_quants[i], 2)))
     resurs.setAttribute('tr', str(tr))
     resurs.setAttribute('tr_rub', '0')
     resurs.setAttribute('cena_tr', '9,6')
