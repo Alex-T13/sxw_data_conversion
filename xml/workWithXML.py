@@ -4,20 +4,21 @@ from xml.dom import minidom
 from openpyxl import load_workbook, workbook
 #from openpyxl import workbook
 
-wb = load_workbook(filename="./excel/10_08-2018.xlsx", data_only=True)
+wb = load_workbook(filename="./excel/10.8-7-9-2020Cap.xlsx", data_only=True)
 ws = wb.active
 
-names = ws.iter_rows(min_row=1, min_col=2, max_row=ws.max_row, max_col=2, values_only=True)
-quants = ws.iter_rows(min_row=1, min_col=4, max_row=ws.max_row, max_col=4, values_only=True)
+names = ws.iter_rows(min_row=1, min_col=1, max_row=ws.max_row, max_col=1, values_only=True)
+quants = ws.iter_rows(min_row=1, min_col=2, max_row=ws.max_row, max_col=2, values_only=True)
 summs = ws.iter_rows(min_row=1, min_col=3, max_row=ws.max_row, max_col=3, values_only=True)
 wb.close()
 
 th_names = [item for sublist in names for item in sublist]
 new_names = list(map(str, th_names))
 th_quants = [item for sublist in quants for item in sublist]
-new_quants = list(map(float, th_quants))
+new_quants = list (map ( float, th_quants))
 th_summs = [item for sublist in summs for item in sublist]
 new_summs = list(map(float, th_summs))
+
 
 # создаём объект
 doc = minidom.Document()
@@ -138,17 +139,3 @@ xml_str = doc.toprettyxml(indent="  ")
 with open("product.xml", "w") as f:
     f.write(xml_str)
 
-
-""" <rascenka npp="1" obosn="СЦЕН-МТ-001" naim="Сайдинг Extra color могано 3660мм s-0.85m2/шт" idGrw="7" klv="15" ed_izm="ШТ" vid_ohr_pp="12" uniq_lab_ohr_pp="5.1" tip="101" cena_0="3.29">
-      <nabor_kf>
-       <koef naim="1-й коэффициент к расценке (справочно)" mat="1" tr="1"/>
-       <koef naim="2-й коэффициент к расценке (справочно)" mat="1" tr="1"/>
-       <koef naim="3-й коэффициент к расценке (справочно)" mat="1" tr="1"/>
-       <koef_total_ohr_pp naim="Коэффициент по группе работ (5.1)" mat="1" tr="1" ohr="1" pp="1"/>
-      </nabor_kf>
-      <cena mat="3" tr="0.29" pryam="3.29" prc_ohr="71.02" prc_pp="47.58"/>
-      <stoimost mat="45" tr="4.35" pryam="49.35" ohr="0" pp="0"/>
-      <materialy>
-       <resurs obosn="СЦЕН-МТ-001" kodcic="" naim="Сайдинг Extra color могано 3660мм s-0.85m2/шт" ed_izm="ШТ" norma="1" klv="15" cena_0="3" stm_0="45" tr="0.29" tr_rub="0" cena_tr="9.6"/>
-      </materialy>
-     </rascenka> """
