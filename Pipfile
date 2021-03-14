@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 openpyxl = "*"
+django = "*"
+delorean = "*"
 
 [dev-packages]
 
