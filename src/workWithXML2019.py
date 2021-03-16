@@ -1,7 +1,7 @@
 #import src.dom.minidom
 
 from xml.dom import minidom
-from openpyxl import load_workbook, workbook
+from openpyxl import load_workbook
 #from openpyxl import workbook
 
 wb = load_workbook(filename="./excel/44-10_2019!.xlsx", data_only=True)
@@ -154,7 +154,8 @@ with open("product.src", "w") as f:
     f.write(xml_str)
 
 
-""" <rascenka npp="1" obosn="СЦЕН-МТ-001" naim="Сайдинг Extra color могано 3660мм s-0.85m2/шт" idGrw="7" klv="15" ed_izm="ШТ" vid_ohr_pp="12" uniq_lab_ohr_pp="5.1" tip="101" cena_0="3.29">
+""" 
+<rascenka npp="1" obosn="СЦЕН-МТ-001" naim="Сайдинг Extra color могано 3660мм s-0.85m2/шт" idGrw="7" klv="15" ed_izm="ШТ" vid_ohr_pp="12" uniq_lab_ohr_pp="5.1" tip="101" cena_0="3.29">
       <nabor_kf>
        <koef naim="1-й коэффициент к расценке (справочно)" mat="1" tr="1"/>
        <koef naim="2-й коэффициент к расценке (справочно)" mat="1" tr="1"/>
@@ -166,4 +167,5 @@ with open("product.src", "w") as f:
       <materialy>
        <resurs obosn="СЦЕН-МТ-001" kodcic="" naim="Сайдинг Extra color могано 3660мм s-0.85m2/шт" ed_izm="ШТ" norma="1" klv="15" cena_0="3" stm_0="45" tr="0.29" tr_rub="0" cena_tr="9.6"/>
       </materialy>
-     </rascenka> """
+     </rascenka> 
+"""

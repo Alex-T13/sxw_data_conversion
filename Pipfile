@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+dynaconf = { extras = ["yaml"], version = "*" }
 openpyxl = "*"
 django = "*"
 delorean = "*"
