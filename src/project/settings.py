@@ -9,23 +9,33 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import os
 from pathlib import Path
+import dj_database_url
+import sentry_sdk
+from django.urls import reverse_lazy
+from dynaconf import settings as dyn
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
+DEBUG = dyn.MODE_DEBUG
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
+if not DEBUG:
+    sentry_sdk.init(dyn.SENTRY_DSN, traces_sample_rate=1.0)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'nulx4x$-fx+9x#+owp!ftjhk7*wwtsp1)s3j6*m)beb2+y7e6v'
+_this_file = Path(__file__).resolve()
+DIR_PROJECT = _this_file.parent.resolve()
+DIR_SRC = DIR_PROJECT.parent.resolve()
+DIR_REPO = DIR_SRC.parent.resolve()
+SECRET_KEY = dyn.SECRET_KEY
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    dyn.HOST,
+] + list(dyn.ALLOWED_HOSTS or [])
 
-ALLOWED_HOSTS = []
+if DEBUG:
+    ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -37,10 +47,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # -------------------------------
+    # "applications.auth_reg.apps. ",
+    # "applications.convert.apps. ",
+    # "applications.download.apps. ",
+    # "applications.hello.apps. ",
+    # "applications.review.apps. ",
+    # "applications.upload.apps. ",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,7 +72,7 @@ ROOT_URLCONF = 'project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [DIR_PROJECT / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,12 +91,8 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+DATABASE_URL = os.getenv("DATABASE_URL", dyn.DATABASE_URL)
+DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
 
 
 # Password validation
@@ -99,6 +113,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+if DEBUG:
+    AUTH_PASSWORD_VALIDATORS = []
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -118,3 +135,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = DIR_REPO / ".static"
+
+STATICFILES_DIRS = [
+    DIR_PROJECT / "static",
+]
+
+if not DEBUG:
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

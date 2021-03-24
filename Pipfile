@@ -8,6 +8,9 @@ dynaconf = { extras = ["yaml"], version = "*" }
 openpyxl = "*"
 django = "*"
 delorean = "*"
+dj-database-url = "*"
+sentry-sdk = "*"
+whitenoise = "*"
 
 [dev-packages]
 
