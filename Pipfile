@@ -7,12 +7,15 @@ name = "pypi"
 dynaconf = { extras = ["yaml"], version = "*" }
 openpyxl = "*"
 django = "*"
-delorean = "*"
 dj-database-url = "*"
+psycopg2-binary = "*"
+delorean = "*"
 sentry-sdk = "*"
 whitenoise = "*"
 
 [dev-packages]
+ipython = "*"
+isort = "*"
 
 [requires]
 python_version = "3.8"
