@@ -131,3 +131,6 @@ STATICFILES_DIRS = [
 
 if not DEBUG:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+MEDIA_ROOT = DIR_REPO / '.media'
+MEDIA_URL = '/media/'

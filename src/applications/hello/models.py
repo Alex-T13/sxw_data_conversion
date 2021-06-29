@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
 
 
 class Profile(models.Model):
@@ -11,34 +12,38 @@ class Profile(models.Model):
         return User.username
 
 
+class BuildingObject(models.Model):
+    name = models.CharField(max_length=255, db_index=True, verbose_name='Название')
+    time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('building_object', kwargs={'building_object_id': self.pk})
+
+    class Meta:
+        verbose_name = 'Строительный объект'
+        verbose_name_plural = 'Строительные объекты'
+        ordering = ['-time_create']
+
+
 class ConstructionMaterial(models.Model):
     title = models.CharField(max_length=31, db_index=True, verbose_name='Обоснование')
     name = models.CharField(max_length=255, db_index=True, verbose_name='Наименование')
     quantity = models.DecimalField(max_digits=12, decimal_places=5, verbose_name='Количество')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена')
     total_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Стоимость')
-    material_base = models.ForeignKey('MaterialBase', on_delete=models.CASCADE)
+    building_object = models.ForeignKey(BuildingObject, on_delete=models.CASCADE, verbose_name='Строительный объект')
 
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('construction_material', kwargs={'construction_material_id': self.pk})
 
-class MaterialBase(models.Model):
-    title = models.CharField(max_length=255, db_index=True)
-    time_create = models.DateTimeField(auto_now_add=True)
-    time_update = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey('BuildingObject', on_delete=models.CASCADE)
-    # materials = models
-    # file = models.FileField(upload_to='excel_files/', storage='')
-    # user_id = models.ForeignKey(on_delete=True)
-
-    def __str__(self):
-        return self.title
-
-
-class BuildingObject(models.Model):
-    name = models.CharField(max_length=255, db_index=True)
-    user = models.ForeignKey('Profile', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.name
+    class Meta:
+        verbose_name = 'Строительный материал'
+        verbose_name_plural = 'Строительные материалы'
+        ordering = ['name', 'title']
