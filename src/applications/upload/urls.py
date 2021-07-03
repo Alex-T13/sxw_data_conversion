@@ -1,6 +1,6 @@
 from django.urls import path
 
-from applications.hello import views
+from applications.main import views
 
 urlpatterns = [
     path('', views.index, name='upload'),

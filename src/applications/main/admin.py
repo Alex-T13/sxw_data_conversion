@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from applications.hello.models import BuildingObject, ConstructionMaterial
+from applications.main.models import BuildingObject, ConstructionMaterial
 
 
 class BuildingObjectAdmin(admin.ModelAdmin):

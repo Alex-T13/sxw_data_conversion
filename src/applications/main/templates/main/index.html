@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+
+{% block content %}
+{% for obj in b_objects %}
+    <div>
+	<p>Объект:  {{obj.name}}</p>
+	<p>Дата создания:  {{obj.time_create|date:"d-m-Y H:i:s"}}</p>
+        <hr>
+    </div>
+{% endfor %}
+
+{% endblock %}

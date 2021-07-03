@@ -1,6 +1,8 @@
 from django import forms
 
+from applications.main.models import BuildingObject
 
-class UploadFileForm(forms.Form):
-    title = forms.CharField(max_length=50)
-    file = forms.FileField()
+
+class AddMaterialsForm(forms.Form):
+    data = forms.FileField()
+    b_object = forms.ModelChoiceField(queryset=BuildingObject.objects.all())

@@ -1,10 +1,16 @@
-#import src.dom.minidom
-
+# import src.dom.minidom
+from pathlib import Path
 from xml.dom import minidom
 from openpyxl import load_workbook
-#from openpyxl import workbook
+# from openpyxl import workbook
+# from project.settings import DIR_SRC
 
-wb = load_workbook(filename="./excel/44-10_2019!.xlsx", data_only=True)
+# path = f"{DIR_SRC}/applications/convert/reports2020/СКУД-4809,35.xlsx"
+_this_dir = Path(__file__).parent.resolve()
+file_name = "Тек.ремонт 26-10-1818,49-ПЛЕВКОВ.xlsx"
+path = f"{_this_dir}/reports2021/{file_name}"
+
+wb = load_workbook(filename=path, data_only=True)
 ws = wb.active
 
 names = ws.iter_rows(min_row=1, min_col=1, max_row=ws.max_row, max_col=1, values_only=True)
@@ -20,18 +26,18 @@ new1_names = []
 new1_quants = []
 new1_summs = []
 
-i=3
+i = 0
 while i < len(th_names):
     new1_names.append(th_names[i])
     new1_quants.append(th_quants[i])
     new1_summs.append(th_summs[i])
-    i += 4
+    i += 1
 
-#th_names = [item for sublist in names for item in sublist]
+# th_names = [item for sublist in names for item in sublist]
 new_names = list(map(str, new1_names))
-#th_quants = [item for sublist in quants for item in sublist]
+# th_quants = [item for sublist in quants for item in sublist]
 new_quants = list(map(float, new1_quants))
-#th_summs = [item for sublist in summs for item in sublist]
+# th_summs = [item for sublist in summs for item in sublist]
 new_summs = list(map(float, new1_summs))
 
 # создаём объект
@@ -150,7 +156,8 @@ while i < len(new_names):
     i += 1
 
 xml_str = doc.toprettyxml(indent="  ")
-with open("product.src", "w") as f:
+file_name_xml = path[:-4] + "xml"
+with open(f"{file_name_xml}", "w") as f:
     f.write(xml_str)
 
 
