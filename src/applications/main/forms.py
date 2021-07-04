@@ -13,7 +13,3 @@ class AddBuildingObjectForm(forms.ModelForm):
             # 'is_hidden'  <input type="hidden" ...>
             'user': forms.Select(attrs={'class': 'form-select', 'type': ''}),
         }
-
-
-
-

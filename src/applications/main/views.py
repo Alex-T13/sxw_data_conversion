@@ -13,7 +13,7 @@ menu_v = [
 
 menu_h = [
     {'title': 'Добавить объект', 'url_name': 'add_object'},
-    {'title': 'Добавить материалы в объект', 'url_name': 'add_object'},
+    {'title': 'Добавить материалы в объект', 'url_name': 'upload'},
     {'title': 'Очистить объект', 'url_name': 'add_object'},
     {'title': 'Удалить объект', 'url_name': 'add_object'},
     {'title': 'Скачать данные объекта (xml)', 'url_name': 'add_object'},

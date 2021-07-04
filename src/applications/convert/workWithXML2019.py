@@ -7,38 +7,50 @@ from openpyxl import load_workbook
 
 # path = f"{DIR_SRC}/applications/convert/reports2020/СКУД-4809,35.xlsx"
 _this_dir = Path(__file__).parent.resolve()
-file_name = "Тек.ремонт 26-10-1818,49-ПЛЕВКОВ.xlsx"
+file_name = "Тек.ремонт ЗАВОД 25-07.03-22999,54.xlsx"
 path = f"{_this_dir}/reports2021/{file_name}"
 
 wb = load_workbook(filename=path, data_only=True)
 ws = wb.active
 
+# nms = ws.iter_rows(min_row=1, min_col=1, max_row=ws.max_row, max_col=1, values_only=True)
+# print(nms)
+
+
 names = ws.iter_rows(min_row=1, min_col=1, max_row=ws.max_row, max_col=1, values_only=True)
 quants = ws.iter_rows(min_row=1, min_col=2, max_row=ws.max_row, max_col=2, values_only=True)
 summs = ws.iter_rows(min_row=1, min_col=3, max_row=ws.max_row, max_col=3, values_only=True)
 wb.close()
+print(quants)
+
+# th_nms = [i for sublist in names]
+print()
+
 
 th_names = [item for sublist in names for item in sublist]
 th_quants = [item for sublist in quants for item in sublist]
 th_summs = [item for sublist in summs for item in sublist]
 
-new1_names = []
-new1_quants = []
-new1_summs = []
+print(th_summs)
+# new1_names = []
+# new1_quants = []
+# new1_summs = []
 
-i = 0
-while i < len(th_names):
-    new1_names.append(th_names[i])
-    new1_quants.append(th_quants[i])
-    new1_summs.append(th_summs[i])
-    i += 1
-
+# i = 0
+# while i < len(th_names):
+#     new1_names.append(th_names[i])
+#     new1_quants.append(th_quants[i])
+#     new1_summs.append(th_summs[i])
+#     i += 1
+# print(new1_summs)
 # th_names = [item for sublist in names for item in sublist]
-new_names = list(map(str, new1_names))
+new_names = list(map(str, th_names))
 # th_quants = [item for sublist in quants for item in sublist]
-new_quants = list(map(float, new1_quants))
+new_quants = list(map(float, th_quants))
 # th_summs = [item for sublist in summs for item in sublist]
-new_summs = list(map(float, new1_summs))
+new_summs = list(map(float, th_summs))
+
+print(new_summs)
 
 # создаём объект
 doc = minidom.Document()
