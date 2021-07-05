@@ -1,8 +1,11 @@
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
-from applications.main.forms import AddBuildingObjectForm
+
+from applications.main.apps import handle_uploaded_file
+from applications.main.forms import AddBuildingObjectForm, AddMaterialsForm
 from applications.main.models import BuildingObject
+from framework.cutom_logging import logger
 
 menu_v = [
     {'title': 'Главная', 'url_name': 'main'},
@@ -52,6 +55,51 @@ def add_building_object(request):
     }
 
     return render(request, 'main/add_object.html', context=context)
+
+
+def upload_file(request):
+    if request.method == 'POST':
+        form = AddMaterialsForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            file = request.FILES.get('data')
+            logger.debug(f"Type: {type(request.FILES.get('data'))}")
+            logger.debug(f"Content_ype: {request.FILES.get('data').content_type}")
+            if file.content_type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                form.add_error('data', 'Не верный формат файла (*.xlsx)')
+                context = {
+                    'mainmenu': menu_v,
+                    'leftmenu': menu_h,
+                    'title': 'Добавление материалов в объект:',
+                    'cat_selected': 0,
+                    'form': form, }
+                return render(request, 'main/upload.html', context=context)
+
+            if file.size > 2621440:
+                form.add_error('data', 'Файл слишком велик.')
+                context = {
+                    'mainmenu': menu_v,
+                    'leftmenu': menu_h,
+                    'title': 'Добавление материалов в объект:',
+                    'cat_selected': 0,
+                    'form': form, }
+                return render(request, 'main/upload.html', context=context)
+
+            handle_uploaded_file(file)
+
+            return redirect('main')  # redirect in object
+    else:
+        form = AddMaterialsForm()
+
+    context = {
+        'mainmenu': menu_v,
+        'leftmenu': menu_h,
+        'title': 'Добавление материалов в объект:',
+        'cat_selected': 0,
+        'form': form,
+    }
+
+    return render(request, 'main/upload.html', context=context)
 
 
 def page_not_found(request, exception):

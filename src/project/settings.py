@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 import dj_database_url
 import sentry_sdk
-from django.urls import reverse_lazy
+# from django.urls import reverse_lazy
 from dynaconf import settings as dyn
 
 
@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # -------------------------------
     'applications.main.apps.MainConfig',
-    'applications.upload.apps.UploadConfig',
 ]
 
 MIDDLEWARE = [

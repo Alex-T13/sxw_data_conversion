@@ -5,4 +5,5 @@ from applications.main import views
 urlpatterns = [
     path('', views.index, name='main'),
     path('add_object/', views.add_building_object, name='add_object'),
+    path('upload/', views.upload_file, name='upload'),
 ]

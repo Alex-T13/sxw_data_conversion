@@ -1,11 +1,8 @@
-# import src.dom.minidom
 from pathlib import Path
 from xml.dom import minidom
 from openpyxl import load_workbook
-# from openpyxl import workbook
-# from project.settings import DIR_SRC
 
-# path = f"{DIR_SRC}/applications/convert/reports2020/СКУД-4809,35.xlsx"
+
 _this_dir = Path(__file__).parent.resolve()
 file_name = "Тек.ремонт ЗАВОД 25-07.03-22999,54.xlsx"
 path = f"{_this_dir}/reports2021/{file_name}"
@@ -13,18 +10,12 @@ path = f"{_this_dir}/reports2021/{file_name}"
 wb = load_workbook(filename=path, data_only=True)
 ws = wb.active
 
-# nms = ws.iter_rows(min_row=1, min_col=1, max_row=ws.max_row, max_col=1, values_only=True)
-# print(nms)
-
 
 names = ws.iter_rows(min_row=1, min_col=1, max_row=ws.max_row, max_col=1, values_only=True)
 quants = ws.iter_rows(min_row=1, min_col=2, max_row=ws.max_row, max_col=2, values_only=True)
 summs = ws.iter_rows(min_row=1, min_col=3, max_row=ws.max_row, max_col=3, values_only=True)
 wb.close()
 print(quants)
-
-# th_nms = [i for sublist in names]
-print()
 
 
 th_names = [item for sublist in names for item in sublist]
@@ -51,6 +42,43 @@ new_quants = list(map(float, th_quants))
 new_summs = list(map(float, th_summs))
 
 print(new_summs)
+
+
+# colA = ws[1]
+# print(f"colA: {colA}")
+
+# ws.iter_cols(min_col=1, max_col=1, min_row=1, max_row=ws.max_row, values_only=True)
+
+for row in ws.iter_rows(min_col=3, max_col=3, max_row=ws.max_row, values_only=True):
+    print(f"c: {row}")
+
+# ns = list(map(float, ws.iter_cols(min_col=3, max_col=3, max_row=ws.max_row, values_only=True)))
+# print(ns)
+
+li = list(row for row in ws.iter_cols(min_col=3, max_col=3, max_row=ws.max_row, values_only=True))
+print(f"li: {li}")
+
+# c = [c * 3 for c in 'list']
+th_n = [item for sublist in ws.iter_rows(min_col=3, max_col=3, max_row=ws.max_row, values_only=True) for item in sublist]
+print(f"th_n: {th_n}")
+
+r = 0
+v = 0
+for row in ws.values:
+    r += 1
+    v = 0
+    for value in row:
+        if v % 3:
+            print(f"value: {value}")
+        v += 1
+
+
+# class Mat(models.Model):
+#     name = models.CharField(max_length=255, db_index=True, verbose_name='Наименование')
+#     quantity = models.DecimalField(max_digits=12, decimal_places=5, verbose_name='Количество')
+
+
+
 
 # создаём объект
 doc = minidom.Document()

@@ -12,9 +12,9 @@ class BuildingObjectAdmin(admin.ModelAdmin):
 
 
 class ConstructionMaterialAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'name', 'quantity', 'price', 'total_cost', 'building_object')
-    list_display_links = ('title', 'name', )
-    search_fields = ('title', 'name', )
+    list_display = ('id', 'name', 'quantity', 'price', 'total_cost', 'building_object')
+    list_display_links = ('name', )
+    search_fields = ('name', )
     # list_editable = ('is_published',)
     # list_filter = ('time_create',)
 

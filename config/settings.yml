@@ -12,11 +12,11 @@ default:
   DIRS_SOURCES:
     - src
   DIRS_TEMPLATES:
-    - src/applications/blog/templates/
-    - src/applications/hello/templates/
-    - src/applications/landing/templates/
-    - src/applications/onboarding/templates/
-    - src/project/templates/
+    - src/applications/main/templates/
+#    - src/applications/hello/templates/
+#    - src/applications/landing/templates/
+#    - src/applications/onboarding/templates/
+#    - src/project/templates/
   HOST: ""
   MODE_DEBUG: true
   MODE_PROFILING: false
