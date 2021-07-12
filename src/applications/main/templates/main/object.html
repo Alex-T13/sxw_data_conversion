@@ -1,0 +1,30 @@
+{% extends "_base.html" %}
+
+{% block content %}
+<table class="table table-hover table-striped">
+  <thead>
+
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Наименование</th>
+      <th scope="col">Ед. изм.</th>
+      <th scope="col">Количество</th>
+      <th scope="col">Цена</th>
+      <th scope="col">Стоимость</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for mat in object_list %}
+      <tr>
+        <th scope="row">{{mat.pk}}</th>
+        <td>{{mat.name}}</td>
+        <td>{{mat.unit}}</td>
+        <td>{{mat.quantity}}</td>
+        <td>{{mat.price}}</td>
+        <td>{{mat.total_cost}}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
+from django.views.generic import ListView, DetailView
 
 from applications.main.apps import handle_uploaded_file
 from applications.main.forms import AddBuildingObjectForm, AddMaterialsForm
-from applications.main.models import BuildingObject
+from applications.main.models import BuildingObject, ConstructionMaterial
 from framework.cutom_logging import logger
 
 menu_v = [
@@ -23,7 +24,62 @@ menu_h = [
 ]
 
 
-def index(request):
+class MainHome(ListView):
+    model = BuildingObject
+    template_name = 'main/index.html'
+    # context_object_name = 'object'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mainmenu'] = menu_v
+        context['leftmenu'] = menu_h
+        context['title'] = 'Список объектов:'
+        # context['check'] = BuildingObject.objects.filter(constructionmaterial__building_object_id=self.model.pk)
+        context['cat_selected'] = 0  # context['object_list'][0].cat_id
+        return context
+
+    def check_materials(self):
+        # check = {}
+        check = BuildingObject.objects.filter(constructionmaterial__building_object_id=self.model.pk)
+        logger.debug(f"check: {check}")
+        return check
+        # return True if check else False
+
+
+class ShowBuildingObject(ListView):
+    model = ConstructionMaterial
+    template_name = 'main/object.html'
+    # slug_url_kwarg = 'post_slug'
+    # context_object_name = 'post'
+
+    def get_queryset(self):
+        return ConstructionMaterial.objects.filter(building_object__id=self.kwargs['object_id'])
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mainmenu'] = menu_v
+        context['leftmenu'] = menu_h
+        context['title'] = f"Список материалов по объекту '{str(context['object_list'][0].building_object)}':"
+        context['cat_selected'] = 0  # context['object_list'][0].cat_id
+        return context
+    # def get_queryset(self):
+    #     return BuildingObject.objects.all()
+
+
+# def index(request):
+#     b_objects = BuildingObject.objects.all()
+#
+#     context = {
+#         'b_objects': b_objects,
+#         'mainmenu': menu_v,
+#         'leftmenu': menu_h,
+#         'title': 'Список объектов:',
+#         'cat_selected': 0,
+#     }
+#     return render(request, 'main/index.html', context=context)
+
+
+def view_object(request, obj_id):
     b_objects = BuildingObject.objects.all()
 
     context = {
@@ -85,9 +141,20 @@ def upload_file(request):
                     'form': form, }
                 return render(request, 'main/upload.html', context=context)
 
-            handle_uploaded_file(file)
-
-            return redirect('main')  # redirect in object
+            object_id = request.POST['b_object']
+            try:
+                handle_uploaded_file(file, object_id)
+            except IndexError:
+                form.add_error('data', 'Структура файла не соответствует шаблону. Смотрите справку.')
+                context = {
+                    'mainmenu': menu_v,
+                    'leftmenu': menu_h,
+                    'title': 'Добавление материалов в объект:',
+                    'cat_selected': 0,
+                    'form': form, }
+                return render(request, 'main/upload.html', context=context)
+            else:
+                return redirect('object', object_id=object_id)  # redirect in object
     else:
         form = AddMaterialsForm()
 
@@ -102,5 +169,5 @@ def upload_file(request):
     return render(request, 'main/upload.html', context=context)
 
 
-def page_not_found(request, exception):
+def pageNotFound(request, exception):
     return HttpResponseNotFound('<h1>Страница не найдена</h1>')

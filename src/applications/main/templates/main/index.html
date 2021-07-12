@@ -1,12 +1,31 @@
 {% extends "_base.html" %}
 
 {% block content %}
-{% for obj in b_objects %}
-    <div>
-	<p>Объект:  {{obj.name}}</p>
-	<p>Дата создания:  {{obj.time_create|date:"d-m-Y H:i:s"}}</p>
-        <hr>
-    </div>
-{% endfor %}
+<table class="table table-hover table-striped">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Объект:</th>
+      <th scope="col">Дата создания:</th>
+      <th scope="col">Добавлены материалы</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for obj in object_list %}
+      <tr>
+        <th scope="row">{{obj.pk}}</th>
+        <td><a href="{{obj.get_absolute_url}}">{{obj.name}}</a></td>
+        <td>{{obj.time_create|date:"d-m-Y H:i:s"}}</td>
+        <td>
+          {% if obj.check %}
+            Да
+          {%else%}
+            {{obj.check}}
+          {%endif%}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}

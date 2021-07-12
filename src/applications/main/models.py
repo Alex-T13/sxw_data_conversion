@@ -3,10 +3,10 @@ from django.db import models
 from django.urls import reverse
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    location = models.CharField(max_length=30, blank=True, verbose_name='Город')
-    birth_date = models.DateField(blank=True, verbose_name='Дата рождения')
+# class Profile(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     location = models.CharField(max_length=30, blank=True, verbose_name='Город')
+#     birth_date = models.DateField(blank=True, verbose_name='Дата рождения')
 
     # def __str__(self):
     #     return User.username
@@ -22,7 +22,7 @@ class BuildingObject(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('building_object', kwargs={'building_object_id': self.pk})
+        return reverse('object', kwargs={'object_id': self.pk})
 
     class Meta:
         verbose_name = 'Строительный объект'
@@ -44,7 +44,7 @@ class ConstructionMaterial(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('construction_material', kwargs={'construction_material_id': self.pk})
+        return reverse('material', kwargs={'material_id': self.pk})
 
     class Meta:
         verbose_name = 'Строительный материал'

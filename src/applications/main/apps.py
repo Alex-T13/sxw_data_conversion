@@ -2,7 +2,6 @@ from django.apps import AppConfig
 
 from openpyxl import load_workbook
 from framework.cutom_logging import logger
-from project.settings import DIR_PROJECT
 
 
 class MainConfig(AppConfig):
@@ -10,12 +9,8 @@ class MainConfig(AppConfig):
     name = f"applications.{label}"
 
 
-def handle_uploaded_file(file):
+def handle_uploaded_file(file, object_id: str):
     from applications.main.models import ConstructionMaterial
-    # new_file = f'{DIR_PROJECT}/temporary_files/file.xlsx'
-    # with open(new_file, 'wb') as destination:
-    #     for chunk in file.chunks():
-    #         destination.write(chunk)
 
     wb = load_workbook(filename=file, data_only=True)
     ws = wb.active
@@ -27,12 +22,12 @@ def handle_uploaded_file(file):
             quantity=row[2],
             price=row[3] if row[3] is not None else None,
             total_cost=row[4],
-            building_object_id='3',
+            building_object_id=object_id,
         )
         for row in ws.values
     ]
 
-    logger.debug(f"materials:{materials[1]}")
+    logger.debug(f"materials:{materials[0]}")
     #
     # for row in enumerate(ws.values):
     #     for value in enumerate(row):
