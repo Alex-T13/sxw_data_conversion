@@ -17,11 +17,11 @@
         <td><a href="{{obj.get_absolute_url}}">{{obj.name}}</a></td>
         <td>{{obj.time_create|date:"d-m-Y H:i:s"}}</td>
         <td>
-          {% if obj.check %}
+          {% if obj.num_material %}
             Да
-          {%else%}
-            {{obj.check}}
-          {%endif%}
+          {% else %}
+            Нет
+          {% endif %}
         </td>
       </tr>
     {% endfor %}

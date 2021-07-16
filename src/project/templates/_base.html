@@ -20,8 +20,11 @@
           </div>
           <ul class="nav nav-pills">
             {% for m in mainmenu %}
-              <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
-              <!--        <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Home</a></li>-->
+              {% if mainmenu_selected == m.title %}
+                <li class="nav-item"><a href="{% url m.url_name %}" class="nav-link active" aria-current="page">{{ m.title }}</a></li>
+              {% else %}
+                <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
+              {% endif %}
             {% endfor %}
           </ul>
         </header>
@@ -34,8 +37,12 @@
           <div class="list-group">
             {% block leftmenu %}
               {% for m in leftmenu %}
+                {% if leftmenu_selected == m.title %}
+                  <a href="{% url m.url_name %}" class="list-group-item list-group-item-action active" aria-current="true">{{ m.title }}</a>
 <!--                class="list-group-item list-group-item-action active" aria-current="true"-->
-                <a href="{% url m.url_name %}" class="list-group-item list-group-item-action">{{ m.title }}</a>
+                {% else %}
+                  <a href="{% url m.url_name %}" class="list-group-item list-group-item-action">{{ m.title }}</a>
+                {% endif %}
               {% endfor %}
             {% endblock leftmenu %}
           </div>

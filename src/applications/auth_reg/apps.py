@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class AuthRegConfig(AppConfig):
-    name = 'auth_reg'
+    label = "auth_reg"
+    name = f"applications.{label}"

@@ -1,12 +1,16 @@
-from django.contrib.auth.models import User
+from typing import Dict
+
+from django.db.models import Count
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView
 
 from applications.main.apps import handle_uploaded_file
 from applications.main.forms import AddBuildingObjectForm, AddMaterialsForm
 from applications.main.models import BuildingObject, ConstructionMaterial
-from framework.cutom_logging import logger
+from framework.custom_logging import logger
+from framework.mixins import ExtendedDataContextMixin
 
 menu_v = [
     {'title': 'Главная', 'url_name': 'main'},
@@ -24,93 +28,51 @@ menu_h = [
 ]
 
 
-class MainHome(ListView):
+class MainHome(ExtendedDataContextMixin, ListView):
     model = BuildingObject
     template_name = 'main/index.html'
-    # context_object_name = 'object'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['mainmenu'] = menu_v
-        context['leftmenu'] = menu_h
-        context['title'] = 'Список объектов:'
-        # context['check'] = BuildingObject.objects.filter(constructionmaterial__building_object_id=self.model.pk)
-        context['cat_selected'] = 0  # context['object_list'][0].cat_id
-        return context
-
-    def check_materials(self):
-        # check = {}
-        check = BuildingObject.objects.filter(constructionmaterial__building_object_id=self.model.pk)
-        logger.debug(f"check: {check}")
-        return check
-        # return True if check else False
-
-
-class ShowBuildingObject(ListView):
-    model = ConstructionMaterial
-    template_name = 'main/object.html'
-    # slug_url_kwarg = 'post_slug'
-    # context_object_name = 'post'
 
     def get_queryset(self):
-        return ConstructionMaterial.objects.filter(building_object__id=self.kwargs['object_id'])
+        return BuildingObject.objects.annotate(num_material=Count('constructionmaterial')).order_by('-time_create')
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['mainmenu'] = menu_v
-        context['leftmenu'] = menu_h
-        context['title'] = f"Список материалов по объекту '{str(context['object_list'][0].building_object)}':"
-        context['cat_selected'] = 0  # context['object_list'][0].cat_id
+    def get_extended_context(self) -> Dict:
+        context = {
+            'title': 'Список объектов:',
+            'mainmenu_selected': 'Главная',
+        }
         return context
-    # def get_queryset(self):
-    #     return BuildingObject.objects.all()
 
 
-# def index(request):
-#     b_objects = BuildingObject.objects.all()
-#
-#     context = {
-#         'b_objects': b_objects,
-#         'mainmenu': menu_v,
-#         'leftmenu': menu_h,
-#         'title': 'Список объектов:',
-#         'cat_selected': 0,
-#     }
-#     return render(request, 'main/index.html', context=context)
+class ShowBuildingObject(ExtendedDataContextMixin, ListView):
+    model = ConstructionMaterial
+    template_name = 'main/object.html'
+
+    def get_queryset(self):
+        queryset = ConstructionMaterial.objects.filter(building_object__id=self.kwargs['object_id'])
+        logger.debug(queryset)
+        return queryset
+
+    def get_extended_context(self) -> Dict:
+        context = {
+            'title': f"Список материалов по объекту: '{self.b_object_name()}'",
+        }
+        return context
+
+    def b_object_name(self):
+        return BuildingObject.objects.filter(id=self.kwargs['object_id'])[0].name
 
 
-def view_object(request, obj_id):
-    b_objects = BuildingObject.objects.all()
+class AddBuildingObject(ExtendedDataContextMixin, CreateView):
+    form_class = AddBuildingObjectForm
+    template_name = 'main/add_object.html'
+    success_url = reverse_lazy('main')
 
-    context = {
-        'b_objects': b_objects,
-        'mainmenu': menu_v,
-        'leftmenu': menu_h,
-        'title': 'Список объектов:',
-        'cat_selected': 0,
-    }
-    return render(request, 'main/index.html', context=context)
-
-
-def add_building_object(request):
-    if request.method == 'POST':
-        form = AddBuildingObjectForm(request.POST)
-        if form.is_valid():
-            print(form.cleaned_data)
-            form.save()
-            return redirect('main')
-    else:
-        form = AddBuildingObjectForm()
-
-    context = {
-        'mainmenu': menu_v,
-        'leftmenu': menu_h,
-        'title': 'Добавление объекта:',
-        'cat_selected': 0,
-        'form': form,
-    }
-
-    return render(request, 'main/add_object.html', context=context)
+    def get_extended_context(self) -> Dict:
+        context = {
+            'title': 'Добавление объекта:',
+            'leftmenu_selected': 'Добавить объект',
+        }
+        return context
 
 
 def upload_file(request):
@@ -127,7 +89,7 @@ def upload_file(request):
                     'mainmenu': menu_v,
                     'leftmenu': menu_h,
                     'title': 'Добавление материалов в объект:',
-                    'cat_selected': 0,
+                    'leftmenu_selected': 'Добавить материалы в объект',
                     'form': form, }
                 return render(request, 'main/upload.html', context=context)
 
@@ -137,7 +99,7 @@ def upload_file(request):
                     'mainmenu': menu_v,
                     'leftmenu': menu_h,
                     'title': 'Добавление материалов в объект:',
-                    'cat_selected': 0,
+                    'leftmenu_selected': 'Добавить материалы в объект',
                     'form': form, }
                 return render(request, 'main/upload.html', context=context)
 
@@ -150,7 +112,7 @@ def upload_file(request):
                     'mainmenu': menu_v,
                     'leftmenu': menu_h,
                     'title': 'Добавление материалов в объект:',
-                    'cat_selected': 0,
+                    'leftmenu_selected': 'Добавить материалы в объект',
                     'form': form, }
                 return render(request, 'main/upload.html', context=context)
             else:
@@ -162,7 +124,7 @@ def upload_file(request):
         'mainmenu': menu_v,
         'leftmenu': menu_h,
         'title': 'Добавление материалов в объект:',
-        'cat_selected': 0,
+        'leftmenu_selected': 'Добавить материалы в объект',
         'form': form,
     }
 

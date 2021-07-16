@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 from openpyxl import load_workbook
-from framework.cutom_logging import logger
+from framework.custom_logging import logger
 
 
 class MainConfig(AppConfig):
