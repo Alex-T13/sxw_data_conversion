@@ -3,14 +3,16 @@ from typing import Dict
 
 from framework.custom_logging import logger
 
-menu_v = [
+menu_h = [
     {'title': 'Главная', 'url_name': 'main'},
-    {'title': 'Помощь', 'url_name': 'main'},
-    {'title': 'Отзывы и предложения', 'url_name': 'main'},
-    {'title': 'Регистрация/Войти', 'url_name': 'register'},
+    {'title': 'Помощь', 'url_name': 'help'},
+    {'title': 'Отзывы и предложения', 'url_name': 'reviews'},
+    {'title': 'Выйти', 'url_name': 'logout'},
+    {'title': 'Регистрация', 'url_name': 'register'},
+    {'title': 'Вход', 'url_name': 'login'},
 ]
 
-menu_h = [
+menu_v = [
     {'title': 'Добавить объект', 'url_name': 'add_object'},
     {'title': 'Добавить материалы в объект', 'url_name': 'upload'},
     {'title': 'Очистить объект', 'url_name': 'add_object'},
@@ -22,11 +24,13 @@ menu_h = [
 class ExtendedDataContextMixin(abc.ABC):
     def get_context_data(self, *args, **kwargs) -> Dict:
         context = super().get_context_data()
-        user_menu_v = menu_v.copy()
+        user_menu_h = []
         if self.request.user.is_authenticated:
-            user_menu_v.pop(-1)
-            context['leftmenu'] = menu_h
-        context['mainmenu'] = user_menu_v
+            user_menu_h = menu_h[0:-2]
+            context['leftmenu'] = menu_v
+        else:
+            user_menu_h = menu_h[0:3] + menu_h[-2:]
+        context['mainmenu'] = user_menu_h
         logger.debug(context)
         extended_context = self.get_extended_context()
         context = {**context, **extended_context}
@@ -35,8 +39,3 @@ class ExtendedDataContextMixin(abc.ABC):
     @abc.abstractmethod
     def get_extended_context(self) -> Dict:
         raise NotImplementedError
-
-
-#         if 'cat_selected' not in context:
-#             context['cat_selected'] = ''
-#         return context

@@ -1,5 +1,6 @@
 from typing import Dict
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
@@ -43,8 +44,11 @@ class MainHome(ExtendedDataContextMixin, ListView):
         return context
 
 
-class ShowBuildingObject(ExtendedDataContextMixin, ListView):
+class ShowBuildingObject(LoginRequiredMixin, ExtendedDataContextMixin, ListView):  # ??????????? detail_view
     model = ConstructionMaterial
+    login_url = reverse_lazy('login')
+    # redirect_field_name = reverse_lazy('main') ????????????
+    success_url = reverse_lazy('main')   # ????????????
     template_name = 'main/object.html'
 
     def get_queryset(self):
@@ -62,10 +66,15 @@ class ShowBuildingObject(ExtendedDataContextMixin, ListView):
         return BuildingObject.objects.filter(id=self.kwargs['object_id'])[0].name
 
 
-class AddBuildingObject(ExtendedDataContextMixin, CreateView):
+class AddBuildingObject(LoginRequiredMixin, ExtendedDataContextMixin, CreateView):
     form_class = AddBuildingObjectForm
-    template_name = 'main/add_object.html'
+    login_url = reverse_lazy('login')
     success_url = reverse_lazy('main')
+    template_name = 'main/add_object.html'
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
     def get_extended_context(self) -> Dict:
         context = {

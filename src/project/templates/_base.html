@@ -21,9 +21,22 @@
           <ul class="nav nav-pills">
             {% for m in mainmenu %}
               {% if mainmenu_selected == m.title %}
-                <li class="nav-item"><a href="{% url m.url_name %}" class="nav-link active" aria-current="page">{{ m.title }}</a></li>
+                <li class="nav-item">
+                  <a href="{% url m.url_name %}" class="nav-link active" aria-current="page">{{ m.title }}</a>
+                </li>
               {% else %}
-                <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
+                {% if forloop.last %}
+                  {% if request.user.is_authenticated %}
+                    <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
+                    <li class="nav-item" >
+                      <button type="button" class="btn btn-success" disabled>| {{user.username}}</button>
+                    </li>
+                  {% else %}
+                    <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
+                  {% endif %}
+                {% else %}
+                  <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
+                {% endif %}
               {% endif %}
             {% endfor %}
           </ul>
@@ -38,8 +51,9 @@
             {% block leftmenu %}
               {% for m in leftmenu %}
                 {% if leftmenu_selected == m.title %}
-                  <a href="{% url m.url_name %}" class="list-group-item list-group-item-action active" aria-current="true">{{ m.title }}</a>
-<!--                class="list-group-item list-group-item-action active" aria-current="true"-->
+                  <a href="{% url m.url_name %}" class="list-group-item list-group-item-action active" aria-current="true">
+                    {{ m.title }}
+                  </a>
                 {% else %}
                   <a href="{% url m.url_name %}" class="list-group-item list-group-item-action">{{ m.title }}</a>
                 {% endif %}
