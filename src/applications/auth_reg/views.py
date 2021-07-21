@@ -30,7 +30,7 @@ class RegisterUser(ExtendedDataContextMixin, CreateView):
 class LoginUser(ExtendedDataContextMixin, LoginView):
     form_class = LoginUserForm
     template_name = 'auth_reg/login.html'
-    success_url = reverse_lazy('main')
+    # success_url = reverse_lazy('main')
 
     def get_success_url(self):
         return reverse_lazy('main')
@@ -45,4 +45,3 @@ class LoginUser(ExtendedDataContextMixin, LoginView):
 
 class LogoutUser(LogoutView):
     template_name = 'auth_reg/logout.html'
-

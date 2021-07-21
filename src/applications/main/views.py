@@ -3,30 +3,12 @@ from typing import Dict
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
 from django.http import HttpResponseNotFound
-from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, FormView
 
-from applications.main.apps import handle_uploaded_file
 from applications.main.forms import AddBuildingObjectForm, AddMaterialsForm
 from applications.main.models import BuildingObject, ConstructionMaterial
-from framework.custom_logging import logger
 from framework.mixins import ExtendedDataContextMixin
-
-menu_v = [
-    {'title': 'Главная', 'url_name': 'main'},
-    {'title': 'Помощь', 'url_name': 'main'},
-    {'title': 'Отзывы и предложения', 'url_name': 'main'},
-    {'title': 'Регистрация/Войти', 'url_name': 'main'},
-]
-
-menu_h = [
-    {'title': 'Добавить объект', 'url_name': 'add_object'},
-    {'title': 'Добавить материалы в объект', 'url_name': 'upload'},
-    {'title': 'Очистить объект', 'url_name': 'add_object'},
-    {'title': 'Удалить объект', 'url_name': 'add_object'},
-    {'title': 'Скачать данные объекта (xml)', 'url_name': 'add_object'},
-]
 
 
 class MainHome(ExtendedDataContextMixin, ListView):
@@ -38,9 +20,10 @@ class MainHome(ExtendedDataContextMixin, ListView):
 
     def get_extended_context(self) -> Dict:
         context = {
-            'title': 'Список объектов:',
             'mainmenu_selected': 'Главная',
         }
+        if self.request.user.is_authenticated:
+            context['title'] = 'Список объектов:'
         return context
 
 
@@ -53,7 +36,6 @@ class ShowBuildingObject(LoginRequiredMixin, ExtendedDataContextMixin, ListView)
 
     def get_queryset(self):
         queryset = ConstructionMaterial.objects.filter(building_object__id=self.kwargs['object_id'])
-        logger.debug(queryset)
         return queryset
 
     def get_extended_context(self) -> Dict:
@@ -67,8 +49,8 @@ class ShowBuildingObject(LoginRequiredMixin, ExtendedDataContextMixin, ListView)
 
 
 class AddBuildingObject(LoginRequiredMixin, ExtendedDataContextMixin, CreateView):
-    form_class = AddBuildingObjectForm
     login_url = reverse_lazy('login')
+    form_class = AddBuildingObjectForm
     success_url = reverse_lazy('main')
     template_name = 'main/add_object.html'
 
@@ -84,60 +66,30 @@ class AddBuildingObject(LoginRequiredMixin, ExtendedDataContextMixin, CreateView
         return context
 
 
-def upload_file(request):
-    if request.method == 'POST':
-        form = AddMaterialsForm(request.POST, request.FILES)
+class UploadFormView(LoginRequiredMixin, ExtendedDataContextMixin, FormView):
+    login_url = reverse_lazy('login')
+    form_class = AddMaterialsForm
+    template_name = 'main/upload.html'
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
 
         if form.is_valid():
-            file = request.FILES.get('data')
-            logger.debug(f"Type: {type(request.FILES.get('data'))}")
-            logger.debug(f"Content_ype: {request.FILES.get('data').content_type}")
-            if file.content_type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-                form.add_error('data', 'Не верный формат файла (*.xlsx)')
-                context = {
-                    'mainmenu': menu_v,
-                    'leftmenu': menu_h,
-                    'title': 'Добавление материалов в объект:',
-                    'leftmenu_selected': 'Добавить материалы в объект',
-                    'form': form, }
-                return render(request, 'main/upload.html', context=context)
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
-            if file.size > 2621440:
-                form.add_error('data', 'Файл слишком велик.')
-                context = {
-                    'mainmenu': menu_v,
-                    'leftmenu': menu_h,
-                    'title': 'Добавление материалов в объект:',
-                    'leftmenu_selected': 'Добавить материалы в объект',
-                    'form': form, }
-                return render(request, 'main/upload.html', context=context)
+    def get_extended_context(self) -> Dict:
+        context = {
+            'title': 'Добавление материалов в объект:',
+            'leftmenu_selected': 'Добавить материалы в объект',
+        }
+        return context
 
-            object_id = request.POST['b_object']
-            try:
-                handle_uploaded_file(file, object_id)
-            except IndexError:
-                form.add_error('data', 'Структура файла не соответствует шаблону. Смотрите справку.')
-                context = {
-                    'mainmenu': menu_v,
-                    'leftmenu': menu_h,
-                    'title': 'Добавление материалов в объект:',
-                    'leftmenu_selected': 'Добавить материалы в объект',
-                    'form': form, }
-                return render(request, 'main/upload.html', context=context)
-            else:
-                return redirect('object', object_id=object_id)  # redirect in object
-    else:
-        form = AddMaterialsForm()
-
-    context = {
-        'mainmenu': menu_v,
-        'leftmenu': menu_h,
-        'title': 'Добавление материалов в объект:',
-        'leftmenu_selected': 'Добавить материалы в объект',
-        'form': form,
-    }
-
-    return render(request, 'main/upload.html', context=context)
+    def get_success_url(self):
+        object_id = self.request.POST['b_object']
+        return reverse_lazy('object', kwargs={'object_id': object_id})
 
 
 def pageNotFound(request, exception):

@@ -15,6 +15,11 @@ def handle_uploaded_file(file, object_id: str):
     wb = load_workbook(filename=file, data_only=True)
     ws = wb.active
 
+    checking_row_0 = next(ws.values)
+    logger.debug(f"row_0:{checking_row_0}")
+    if checking_row_0 != ('NAIM', 'ED_IZM', 'KOL_VO', 'PRICE', 'COST'):
+        raise IndexError
+
     materials = [
         ConstructionMaterial(
             name=row[0],
@@ -27,18 +32,4 @@ def handle_uploaded_file(file, object_id: str):
         for row in ws.values
     ]
 
-    logger.debug(f"materials:{materials[0]}")
-    #
-    # for row in enumerate(ws.values):
-    #     for value in enumerate(row):
-    #         if value[0] % 3:
-    #             print(f"value: {value[1]}")
-    # нужна проверка первой строки
-
-    try:
-        ConstructionMaterial.objects.bulk_create(materials[1:])
-        # ConstructionMaterial.objects.create(**data)
-    except Exception:
-        logger.info('Something went wrong')
-    else:
-        logger.info('The transaction was successful')
+    ConstructionMaterial.objects.bulk_create(materials[1:])

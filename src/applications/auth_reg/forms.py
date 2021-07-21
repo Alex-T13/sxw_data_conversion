@@ -4,20 +4,18 @@ from django.contrib.auth.models import User
 
 
 class RegisterUserForm(UserCreationForm):
-    username = forms.CharField(label='Логин* ', widget=forms.TextInput(
+    username = forms.CharField(max_length=100, label='Логин* ', widget=forms.TextInput(
         attrs={'class': 'form-control', 'type': 'text'}))
-    # first_name = forms.CharField(label='Имя', widget=forms.TextInput(attrs={'class': 'form-input'}))
-    # last_name = forms.CharField(label='Фамилия', widget=forms.TextInput(attrs={'class': 'form-input'}))
-    email = forms.EmailField(required=True, label='Email* ', widget=forms.EmailInput(
+    email = forms.EmailField(max_length=100, required=True, label='Email* ', widget=forms.EmailInput(
         attrs={'class': 'form-control', 'type': 'email'}))
-    password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput(
+    password1 = forms.CharField(max_length=100, label='Пароль', widget=forms.PasswordInput(
         attrs={'class': 'form-control', 'type': 'password'}))
-    password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput(
+    password2 = forms.CharField(max_length=100, label='Повтор пароля', widget=forms.PasswordInput(
         attrs={'class': 'form-control', 'type': 'password'}))
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control', 'type': 'text'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control', 'type': 'text'}),
@@ -25,8 +23,8 @@ class RegisterUserForm(UserCreationForm):
 
 
 class LoginUserForm(AuthenticationForm):
-    username = forms.CharField(label='Логин', widget=forms.TextInput(
+    username = forms.CharField(max_length=100, label='Логин', widget=forms.TextInput(
         attrs={'class': 'form-control', 'type': 'text', 'id': 'inputUsername'}))
-    password = forms.CharField(label='Пароль', widget=forms.PasswordInput(
+    password = forms.CharField(max_length=100, label='Пароль', widget=forms.PasswordInput(
         attrs={'class': 'form-control', 'type': 'password', 'id': 'inputPassword'}))
 

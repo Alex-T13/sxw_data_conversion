@@ -29,7 +29,7 @@
                   {% if request.user.is_authenticated %}
                     <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
                     <li class="nav-item" >
-                      <button type="button" class="btn btn-success" disabled>| {{user.username}}</button>
+                      <button type="button" class="btn btn-success" disabled>{{user.username}}</button>
                     </li>
                   {% else %}
                     <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
