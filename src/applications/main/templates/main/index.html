@@ -2,32 +2,34 @@
 
 {% block content %}
 {% if request.user.is_authenticated %}
-  <table class="table table-hover table-striped">
-    <thead>
-      <tr>
-        <th scope="col">ID</th>
-        <th scope="col">Объект:</th>
-        <th scope="col">Дата создания:</th>
-        <th scope="col">Добавлены материалы</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for obj in object_list %}
+  {% if object_list%}
+    <table class="table table-hover table-striped">
+      <thead>
         <tr>
-          <th scope="row">{{obj.pk}}</th>
-          <td><a href="{{obj.get_absolute_url}}">{{obj.name}}</a></td>
-          <td>{{obj.time_create|date:"d-m-Y H:i:s"}}</td>
-          <td>
-            {% if obj.num_material %}
-              Да
-            {% else %}
-              Нет
-            {% endif %}
-          </td>
+          <th scope="col">ID</th>
+          <th scope="col">Объект:</th>
+          <th scope="col">Дата создания:</th>
+          <th scope="col">Добавлены материалы</th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for obj in object_list %}
+          <tr>
+            <th scope="row">{{obj.pk}}</th>
+            <td><a href="{{obj.get_absolute_url}}">{{obj.name}}</a></td>
+            <td>{{obj.time_create|date:"d-m-Y H:i:s"}}</td>
+            <td>
+              {% if obj.num_material %}
+                Да
+              {% else %}
+                Нет
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
 {% else %}
   <h2>В данный момент Вы не аутетифицированы, как пользователь данного сайта.</h2>
   <h3>Пожалуйста войдите или зарегистрируйтесь.</h3>

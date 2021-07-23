@@ -10,7 +10,7 @@ from applications.auth_reg.forms import RegisterUserForm, LoginUserForm
 from framework.mixins import ExtendedDataContextMixin
 
 
-class RegisterUser(ExtendedDataContextMixin, CreateView):
+class RegisterUserView(ExtendedDataContextMixin, CreateView):
     form_class = RegisterUserForm
     template_name = 'auth_reg/register.html'
 
@@ -27,7 +27,7 @@ class RegisterUser(ExtendedDataContextMixin, CreateView):
         return redirect('main')
 
 
-class LoginUser(ExtendedDataContextMixin, LoginView):
+class LoginUserView(ExtendedDataContextMixin, LoginView):
     form_class = LoginUserForm
     template_name = 'auth_reg/login.html'
     # success_url = reverse_lazy('main')
@@ -43,5 +43,5 @@ class LoginUser(ExtendedDataContextMixin, LoginView):
         return context
 
 
-class LogoutUser(LogoutView):
+class LogoutUserView(LogoutView):
     template_name = 'auth_reg/logout.html'

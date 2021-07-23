@@ -6,7 +6,7 @@ from applications.main.models import BuildingObject
 from framework.custom_logging import logger
 
 
-class AddBuildingObjectForm(forms.ModelForm):
+class AddBuildObjectForm(forms.ModelForm):
     class Meta:
         model = BuildingObject
         fields = ['name']
@@ -17,9 +17,19 @@ class AddBuildingObjectForm(forms.ModelForm):
 
 class AddMaterialsForm(forms.Form):
     data = forms.FileField(max_length=55, label='Файл для загрузки (*.xlsx)',
-                           widget=forms.FileInput(attrs={'class': 'form-control', 'type': 'file', 'id': 'formFile'}))
+                           widget=forms.FileInput(attrs={'class': 'form-control', 'type': 'file', 'id': 'formFile'})
+                           )
     b_object = forms.ModelChoiceField(queryset=BuildingObject.objects.all(), label='Объект',
-                                      widget=forms.Select(attrs={'class': 'form-select', 'type': ''}))
+                                      widget=forms.Select(attrs={'class': 'form-select', 'type': ''})
+                                      )
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super(AddMaterialsForm, self).__init__(*args, **kwargs)
+
+        self.fields['b_object'].queryset = BuildingObject.objects.filter(user__id=self.request.user.id)
+        logger.debug(f"request.user.id: {self.request.user.id}")
+        logger.debug(f"self.fields['b_object'].queryset_modified: {self.fields['b_object'].queryset}")
 
     def clean_data(self):
         data = self.cleaned_data['data']
@@ -35,7 +45,6 @@ class AddMaterialsForm(forms.Form):
         logger.debug(f"cleaned_data: {self.cleaned_data}")
         data = self.cleaned_data['data']
         object_id = self.cleaned_data['b_object'].id
-
         logger.debug(f"object_id: {object_id}")
 
         try:
@@ -45,7 +54,20 @@ class AddMaterialsForm(forms.Form):
         except IntegrityError:
             raise forms.ValidationError('При сохранении данных что-то пошло не так. Возможно проблема '
                                         'кроется в структуре данных Вашего исходного файла.', code='d_base')
-        return data
+
+
+class ClearDelBuildObjectForm(forms.Form):
+    b_object = forms.ModelChoiceField(queryset=BuildingObject.objects.all(), label='Объект',
+                                      widget=forms.Select(attrs={'class': 'form-select', 'type': ''})
+                                      )
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super(ClearDelBuildObjectForm, self).__init__(*args, **kwargs)
+
+        self.fields['b_object'].queryset = BuildingObject.objects.filter(user__id=self.request.user.id)
+        logger.debug(f"request.user.id: {self.request.user.id}")
+        logger.debug(f"self.fields['b_object'].queryset_modified: {self.fields['b_object'].queryset}")
 
 
 # ------------------- validators ---------------------
