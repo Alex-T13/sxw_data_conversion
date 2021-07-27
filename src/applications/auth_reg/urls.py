@@ -1,7 +1,7 @@
 from django.urls import path
 
 from applications.auth_reg import views
-from applications.main.views import pageNotFound
+# from applications.main.views import pageNotFound
 
 urlpatterns = [
     path('login/', views.LoginUserView.as_view(), name='login'),
@@ -9,4 +9,4 @@ urlpatterns = [
     path('register/', views.RegisterUserView.as_view(), name='register'),
 ]
 
-handler404 = pageNotFound
+# handler404 = pageNotFound

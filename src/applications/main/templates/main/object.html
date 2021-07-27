@@ -5,7 +5,7 @@
   <thead>
 
     <tr>
-      <th scope="col">ID</th>
+      <th scope="col">№</th>
       <th scope="col">Наименование</th>
       <th scope="col">Ед. изм.</th>
       <th scope="col">Количество</th>
@@ -16,7 +16,7 @@
   <tbody>
     {% for mat in object_list %}
       <tr>
-        <th scope="row">{{mat.pk}}</th>
+        <th scope="row">{{mat.id_instance}}</th>
         <td>{{mat.name}}</td>
         <td>{{mat.unit}}</td>
         <td>{{mat.quantity}}</td>

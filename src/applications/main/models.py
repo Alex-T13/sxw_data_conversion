@@ -22,10 +22,12 @@ class BuildingObject(models.Model):
 
 
 class ConstructionMaterial(models.Model):
+
+    id_instance = models.IntegerField(default=0,)
     name = models.CharField(max_length=255, db_index=True, verbose_name='Наименование')
     unit = models.CharField(max_length=10, null=True, verbose_name='Ед. измерения')
     quantity = models.DecimalField(max_digits=12, decimal_places=5, verbose_name='Количество')
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, verbose_name='Цена')
+    price = models.DecimalField(max_digits=13, decimal_places=5, null=True, verbose_name='Цена')
     total_cost = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Стоимость')
     building_object = models.ForeignKey(BuildingObject, on_delete=models.CASCADE, verbose_name='Строительный объект')
     objects = models.Manager()
@@ -39,4 +41,4 @@ class ConstructionMaterial(models.Model):
     class Meta:
         verbose_name = 'Строительный материал'
         verbose_name_plural = 'Строительные материалы'
-        ordering = ['name', 'id']
+        ordering = ['id_instance', 'name']

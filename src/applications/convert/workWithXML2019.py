@@ -44,42 +44,6 @@ new_summs = list(map(float, th_summs))
 print(new_summs)
 
 
-# colA = ws[1]
-# print(f"colA: {colA}")
-
-# ws.iter_cols(min_col=1, max_col=1, min_row=1, max_row=ws.max_row, values_only=True)
-
-for row in ws.iter_rows(min_col=3, max_col=3, max_row=ws.max_row, values_only=True):
-    print(f"c: {row}")
-
-# ns = list(map(float, ws.iter_cols(min_col=3, max_col=3, max_row=ws.max_row, values_only=True)))
-# print(ns)
-
-li = list(row for row in ws.iter_cols(min_col=3, max_col=3, max_row=ws.max_row, values_only=True))
-print(f"li: {li}")
-
-# c = [c * 3 for c in 'list']
-th_n = [item for sublist in ws.iter_rows(min_col=3, max_col=3, max_row=ws.max_row, values_only=True) for item in sublist]
-print(f"th_n: {th_n}")
-
-r = 0
-v = 0
-for row in ws.values:
-    r += 1
-    v = 0
-    for value in row:
-        if v % 3:
-            print(f"value: {value}")
-        v += 1
-
-
-# class Mat(models.Model):
-#     name = models.CharField(max_length=255, db_index=True, verbose_name='Наименование')
-#     quantity = models.DecimalField(max_digits=12, decimal_places=5, verbose_name='Количество')
-
-
-
-
 # создаём объект
 doc = minidom.Document()
 

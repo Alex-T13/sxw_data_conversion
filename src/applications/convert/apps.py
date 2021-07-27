@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class ConvertConfig(AppConfig):
-    name = 'convert'
+    label = "convert"
+    name = f"applications.{label}"

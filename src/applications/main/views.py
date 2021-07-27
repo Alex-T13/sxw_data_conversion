@@ -1,12 +1,15 @@
+import os
 from typing import Dict
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, FormView
 
-from applications.main.forms import AddBuildObjectForm, AddMaterialsForm, ClearDelBuildObjectForm
+from applications.main.apps import create_xml
+from applications.main.forms import AddBuildObjectForm, AddMaterialsForm, SelectBuildObjectForm
 from applications.main.models import BuildingObject, ConstructionMaterial
 from framework.custom_logging import logger
 from framework.mixins import ExtendedDataContextMixin
@@ -27,8 +30,8 @@ class MainHomeView(ExtendedDataContextMixin, ListView):
         if self.request.user.is_authenticated:
             context['title'] = 'Список объектов:'
 
+        logger.debug(f"self.object_list: {self.object_list}")
         if not self.object_list:
-            logger.debug(f"self.object_list: {self.object_list}")
             context['title'] = 'У Вас пока нет созданных объектов.'
         return context
 
@@ -100,7 +103,7 @@ class UploadFormView(LoginRequiredMixin, ExtendedDataContextMixin, FormView):
 class CleanBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView, ):
     login_url = reverse_lazy('login')
 
-    form_class = ClearDelBuildObjectForm
+    form_class = SelectBuildObjectForm
     success_url = reverse_lazy('main')
     template_name = 'main/clean_object.html'
 
@@ -110,7 +113,6 @@ class CleanBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormVie
         return kwargs
 
     def post(self, request, *args, **kwargs):
-
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
@@ -132,7 +134,7 @@ class CleanBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormVie
 class DelBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,):
     login_url = reverse_lazy('login')
 
-    form_class = ClearDelBuildObjectForm
+    form_class = SelectBuildObjectForm
     success_url = reverse_lazy('main')
     template_name = 'main/del_object.html'
 
@@ -142,7 +144,6 @@ class DelBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
         return kwargs
 
     def post(self, request, *args, **kwargs):
-
         form_class = self.get_form_class()
         form = self.get_form(form_class)
 
@@ -161,5 +162,62 @@ class DelBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
         return context
 
 
-def pageNotFound(request, exception):
-    return HttpResponseNotFound('<h1>Страница не найдена</h1>')
+class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,):
+    login_url = reverse_lazy('login')
+
+    form_class = SelectBuildObjectForm
+    # success_url = reverse_lazy('download', kwargs={'object_id': self.request.POST['b_object']})
+    template_name = 'main/select_dl_obj.html'
+
+    def get_form_kwargs(self):
+        kwargs = super(SelectDLObjectView, self).get_form_kwargs()
+        kwargs.update({'request': self.request})
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+
+        if form.is_valid():
+            logger.debug(f"self.request.POST['b_object']: {self.request.POST['b_object']}")
+            object_id = self.request.POST['b_object']
+            logger.debug(f"self.request.user.id: {self.request.user.id}")
+            user_id = self.request.user.id
+
+            create_xml(object_id=object_id, user_id=user_id)
+
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get_extended_context(self) -> Dict:
+        context = {
+            'title': 'Скачать данные объекта (xml):',
+            'leftmenu_selected': 'Скачать данные объекта (xml)',
+        }
+        return context
+
+    def get_success_url(self):
+        object_id = self.request.POST['b_object']
+        return reverse_lazy('download', kwargs={'object_id': object_id})
+
+
+def download_xml(request, **kwargs):
+    object_id = kwargs['object_id']
+    logger.debug(f"kwargs['object_id']: {kwargs['object_id']}")
+
+    user_id = request.user.id
+    logger.debug(f"request.user.id: {request.user.id}")
+
+    file_name = f"Materials_obj{object_id}.xml"
+    file_path = f"{settings.MEDIA_ROOT}/{user_id}/xml/{file_name}"
+
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type='text/xml')
+            response['Content-Disposition'] = f"attachment; filename= {os.path.basename(file_path)}"
+            return response
+
+
+# def pageNotFound(request, exception):
+#     return HttpResponseNotFound('<h1>Страница не найдена</h1>')

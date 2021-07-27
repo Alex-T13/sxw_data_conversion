@@ -1,7 +1,7 @@
 from django.urls import path
 
 from applications.main import views
-from applications.main.views import pageNotFound
+# from applications.main.views import pageNotFound
 
 urlpatterns = [
     path('', views.MainHomeView.as_view(), name='main'),
@@ -10,9 +10,10 @@ urlpatterns = [
     path('clear_object/', views.CleanBuildObjectView.as_view(), name='clear_object'),
     path('del_object/', views.DelBuildObjectView.as_view(), name='del_object'),
     path('upload/', views.UploadFormView.as_view(), name='upload'),
-    path('download/', views.UploadFormView.as_view(), name='download'),
+    path('select_dl_obj/', views.SelectDLObjectView.as_view(), name='select_dl_obj'),
+    path('download/<int:object_id>', views.download_xml, name='download'),
     path('help/', views.MainHomeView.as_view(), name='help'),
     path('reviews/', views.MainHomeView.as_view(), name='reviews'),
 ]
 
-handler404 = pageNotFound
+# handler404 = pageNotFound

@@ -17,14 +17,14 @@ menu_v = [
     {'title': 'Добавить материалы в объект', 'url_name': 'upload'},
     {'title': 'Очистить объект', 'url_name': 'clear_object'},
     {'title': 'Удалить объект', 'url_name': 'del_object'},
-    {'title': 'Скачать данные объекта (xml)', 'url_name': 'add_object'},
+    {'title': 'Скачать данные объекта (xml)', 'url_name': 'select_dl_obj'},
 ]
 
 
 class ExtendedDataContextMixin(abc.ABC):
     def get_context_data(self, *args, **kwargs) -> Dict:
         context = super().get_context_data()
-        user_menu_h = []
+        # user_menu_h = []
         if self.request.user.is_authenticated:
             user_menu_h = menu_h[0:-2]
             context['leftmenu'] = menu_v

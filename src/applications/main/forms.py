@@ -56,14 +56,14 @@ class AddMaterialsForm(forms.Form):
                                         'кроется в структуре данных Вашего исходного файла.', code='d_base')
 
 
-class ClearDelBuildObjectForm(forms.Form):
+class SelectBuildObjectForm(forms.Form):
     b_object = forms.ModelChoiceField(queryset=BuildingObject.objects.all(), label='Объект',
                                       widget=forms.Select(attrs={'class': 'form-select', 'type': ''})
                                       )
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
-        super(ClearDelBuildObjectForm, self).__init__(*args, **kwargs)
+        super(SelectBuildObjectForm, self).__init__(*args, **kwargs)
 
         self.fields['b_object'].queryset = BuildingObject.objects.filter(user__id=self.request.user.id)
         logger.debug(f"request.user.id: {self.request.user.id}")
