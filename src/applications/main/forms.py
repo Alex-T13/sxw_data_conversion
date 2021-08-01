@@ -16,7 +16,7 @@ class AddBuildObjectForm(forms.ModelForm):
 
 
 class AddMaterialsForm(forms.Form):
-    data = forms.FileField(max_length=55, label='Файл для загрузки (*.xlsx)',
+    data = forms.FileField(max_length=100, label='Файл для загрузки (*.xlsx)',
                            widget=forms.FileInput(attrs={'class': 'form-control', 'type': 'file', 'id': 'formFile'})
                            )
     b_object = forms.ModelChoiceField(queryset=BuildingObject.objects.all(), label='Объект',
@@ -42,8 +42,11 @@ class AddMaterialsForm(forms.Form):
 
     def clean(self):
         super(AddMaterialsForm, self).clean()
-        logger.debug(f"cleaned_data: {self.cleaned_data}")
-        data = self.cleaned_data['data']
+        logger.debug(f"self.cleaned_data: {self.cleaned_data}")
+        try:
+            data = self.cleaned_data['data']
+        except KeyError:
+            raise forms.ValidationError('Файл не загружается. С ним что-то не так. Смотрите справку.', code='key_error')
         object_id = self.cleaned_data['b_object'].id
         logger.debug(f"object_id: {object_id}")
 
@@ -51,9 +54,13 @@ class AddMaterialsForm(forms.Form):
             handle_uploaded_file(data, object_id)
         except IndexError:
             raise forms.ValidationError('Структура файла не соответствует шаблону. Смотрите справку.', code='index')
+        except TypeError:
+            raise forms.ValidationError('Данные в файле заполнены не верно. Возможно есть пропущенные пустые ячейки. '
+                                        'Смотрите справку. (Попробуйте удалить несколько пустых строк в конце файла '
+                                        'или создать новый файл и скопировать данные в него.)', code='type_error')
         except IntegrityError:
             raise forms.ValidationError('При сохранении данных что-то пошло не так. Возможно проблема '
-                                        'кроется в структуре данных Вашего исходного файла.', code='d_base')
+                                        'кроется в структуре данных Вашего исходного файла.', code='dbase_error')
 
 
 class SelectBuildObjectForm(forms.Form):

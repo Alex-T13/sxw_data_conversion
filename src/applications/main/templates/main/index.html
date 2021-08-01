@@ -3,22 +3,22 @@
 {% block content %}
 {% if request.user.is_authenticated %}
   {% if object_list%}
-    <table class="table table-hover table-striped">
-      <thead>
+    <table class="table table-hover">
+      <thead class="table-light">
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Объект:</th>
-          <th scope="col">Дата создания:</th>
-          <th scope="col">Добавлены материалы</th>
+          <th scope="col" class="text-center align-middle">ID</th>
+          <th scope="col" class="text-center align-middle">Название объекта:</th>
+          <th scope="col" class="text-center">Дата создания:</th>
+          <th scope="col" class="text-center">Добавлены материалы</th>
         </tr>
       </thead>
       <tbody>
         {% for obj in object_list %}
           <tr>
-            <th scope="row">{{obj.pk}}</th>
-            <td><a href="{{obj.get_absolute_url}}">{{obj.name}}</a></td>
-            <td>{{obj.time_create|date:"d-m-Y H:i:s"}}</td>
-            <td>
+            <th scope="row" class="text-center">{{obj.pk}}</th>
+            <td><a href="{{obj.get_absolute_url}}">{{obj.name|truncatechars:100}}</a></td>
+            <td class="text-center">{{obj.time_create|date:"d-m-Y H:i:s"}}</td>
+            <td class="text-center">
               {% if obj.num_material %}
                 Да
               {% else %}

@@ -3,7 +3,7 @@ from typing import Dict
 
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.http import HttpResponseNotFound, HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, FormView
@@ -30,7 +30,7 @@ class MainHomeView(ExtendedDataContextMixin, ListView):
         if self.request.user.is_authenticated:
             context['title'] = 'Список объектов:'
 
-        logger.debug(f"self.object_list: {self.object_list}")
+        # logger.debug(f"self.object_list: {self.object_list}")
         if not self.object_list:
             context['title'] = 'У Вас пока нет созданных объектов.'
         return context
@@ -39,7 +39,6 @@ class MainHomeView(ExtendedDataContextMixin, ListView):
 class ShowBuildingObjectView(LoginRequiredMixin, ExtendedDataContextMixin, ListView):
     model = ConstructionMaterial
     login_url = reverse_lazy('login')
-    # redirect_field_name = reverse_lazy('main') #????????????
     template_name = 'main/object.html'
 
     def get_queryset(self):
@@ -48,12 +47,23 @@ class ShowBuildingObjectView(LoginRequiredMixin, ExtendedDataContextMixin, ListV
 
     def get_extended_context(self) -> Dict:
         context = {
-            'title': f"Список материалов по объекту: '{self.b_object_name()}'",
+            'title': self.b_object_name(),
+            'sum_mat': self.sum_mat(),
         }
         return context
 
     def b_object_name(self):
-        return BuildingObject.objects.filter(id=self.kwargs['object_id'])[0].name
+        b_object_name = f'Список материалов по объекту: "{self.object_list[0].building_object}"' \
+            if self.object_list else f'Нет материалов привязанных к этому объекту.'
+
+        # logger.debug(f"b_object_name: {b_object_name}")
+        return b_object_name
+
+    def sum_mat(self):
+        sum_mat = self.object_list.aggregate(sum_mat=Sum('total_cost')).get('sum_mat')
+
+        # logger.debug(f"sum_mat: {sum_mat}")
+        return sum_mat
 
 
 class AddBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, CreateView):

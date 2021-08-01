@@ -6,8 +6,8 @@ except ImportError:
     settings = {}
 
 FORMATS = {
-    0: "{asctime} | {name}.{levelname} | {module}.{funcName} | {message}",
-    1: "{asctime} | {name}.{levelname}\n| {pathname}:{lineno}\n| {message}\n",
+    0: "{asctime} | {name}.{levelname}| {module}.{funcName} | {message}",
+    1: "\n{asctime} | {name}.{levelname}\n| {pathname}:{lineno}\n| {message}",
 }
 
 LEVELS = {

@@ -1,30 +1,34 @@
 {% extends "_base.html" %}
 
 {% block content %}
-<table class="table table-hover table-striped">
-  <thead>
-
-    <tr>
-      <th scope="col">№</th>
-      <th scope="col">Наименование</th>
-      <th scope="col">Ед. изм.</th>
-      <th scope="col">Количество</th>
-      <th scope="col">Цена</th>
-      <th scope="col">Стоимость</th>
+<table class="table table-hover ">  <!--  table-striped-->
+  <thead class="table-light">
+    <tr>   <!--  class="d-flex"-->
+      <th scope="col" class="text-center">№</th>  <!--  scope="col"   class="col-1"-->
+      <th scope="col" class="text-center">Наименование</th>
+      <th scope="col" class="text-center">Ед.изм.</th>
+      <th scope="col" class="text-center">Количество</th>
+      <th scope="col" class="text-center">Цена</th>
+      <th scope="col" class="text-center">Стоимость</th>
     </tr>
   </thead>
   <tbody>
     {% for mat in object_list %}
       <tr>
-        <th scope="row">{{mat.id_instance}}</th>
-        <td>{{mat.name}}</td>
-        <td>{{mat.unit}}</td>
-        <td>{{mat.quantity}}</td>
-        <td>{{mat.price}}</td>
-        <td>{{mat.total_cost}}</td>
+        <th scope="row" class="text-center">{{mat.id_instance}}</th>
+        <td>{{mat.name|truncatechars:100}}</td>
+        <td class="text-center">{{mat.unit}}</td>
+        <td class="text-end">{{mat.quantity|floatformat:"-5g"}}</td>
+        <td class="text-end">{{mat.price|floatformat:"-2g"}}</td>
+        <td class="text-end">{{mat.total_cost|floatformat:"-2g"}}</td>
       </tr>
     {% endfor %}
   </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4" class="text-center"><b>Всего материалов на сумму:</b></td>
+      <td colspan="2" class="text-end"><b>{{sum_mat|floatformat:"-2g"}}</b></td>
+  </tfoot>
 </table>
 
 {% endblock %}

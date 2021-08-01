@@ -31,9 +31,9 @@ class ExtendedDataContextMixin(abc.ABC):
         else:
             user_menu_h = menu_h[0:3] + menu_h[-2:]
         context['mainmenu'] = user_menu_h
-        logger.debug(context)
         extended_context = self.get_extended_context()
         context = {**context, **extended_context}
+        logger.debug(context)
         return context
 
     @abc.abstractmethod
