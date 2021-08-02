@@ -7,21 +7,40 @@ from framework.custom_logging import logger
 
 
 class AddBuildObjectForm(forms.ModelForm):
+
     class Meta:
         model = BuildingObject
-        fields = ['name']
+        fields = ['name', 'base']
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'type': 'text', 'placeholder': 'Название объекта'}),
+            'name': forms.TextInput(attrs={"class": "form-control", "type": "text", "placeholder": "Название объекта"}),
+            'base': forms.TextInput(attrs={"class": "form-control", "type": "text", "disabled": ""}),
         }
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super(AddBuildObjectForm, self).__init__(*args, **kwargs)
+        self.instance.user = self.request.user
+        logger.debug(f"self.instance.user: {self.instance.user}")
+
+    def clean(self):
+        super(AddBuildObjectForm, self).clean()
+        count_obj = BuildingObject.objects.filter(user__id=self.request.user.id).count()
+        if count_obj >= 5:
+            raise forms.ValidationError('Вы больше не можете создавать объекты. Вы достигли максимального колличества.',
+                                        code='overflow')
 
 
 class AddMaterialsForm(forms.Form):
-    data = forms.FileField(max_length=100, label='Файл для загрузки (*.xlsx)',
-                           widget=forms.FileInput(attrs={'class': 'form-control', 'type': 'file', 'id': 'formFile'})
-                           )
-    b_object = forms.ModelChoiceField(queryset=BuildingObject.objects.all(), label='Объект',
-                                      widget=forms.Select(attrs={'class': 'form-select', 'type': ''})
-                                      )
+    data = forms.FileField(
+        max_length=100, label='Файл для загрузки (*.xlsx)', widget=forms.FileInput(
+            attrs={'class': 'form-control', 'type': 'file', 'id': 'formFile'}
+        )
+    )
+    b_object = forms.ModelChoiceField(
+        queryset=BuildingObject.objects.all(), label='Объект', widget=forms.Select(
+            attrs={'class': 'form-select', 'type': ''}
+        )
+    )
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
@@ -35,14 +54,13 @@ class AddMaterialsForm(forms.Form):
         data = self.cleaned_data['data']
         logger.debug(f"Content_type: {data.content_type}")
         if data.content_type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-            raise forms.ValidationError('Не верный формат файла, должен быть *.xlsx', code='invalid content type')
+            raise forms.ValidationError('Не верный формат файла, должен быть *.xlsx', code='invalid_content_type')
         if data.size > 2621440:
             raise forms.ValidationError('Файл слишком велик.', code='large')
         return data
 
     def clean(self):
         super(AddMaterialsForm, self).clean()
-        logger.debug(f"self.cleaned_data: {self.cleaned_data}")
         try:
             data = self.cleaned_data['data']
         except KeyError:
@@ -64,17 +82,16 @@ class AddMaterialsForm(forms.Form):
 
 
 class SelectBuildObjectForm(forms.Form):
-    b_object = forms.ModelChoiceField(queryset=BuildingObject.objects.all(), label='Объект',
-                                      widget=forms.Select(attrs={'class': 'form-select', 'type': ''})
-                                      )
+    b_object = forms.ModelChoiceField(
+        queryset=BuildingObject.objects.all(), label='Объект', widget=forms.Select(
+            attrs={'class': 'form-select', 'type': ''}
+        )
+    )
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
         super(SelectBuildObjectForm, self).__init__(*args, **kwargs)
-
         self.fields['b_object'].queryset = BuildingObject.objects.filter(user__id=self.request.user.id)
-        logger.debug(f"request.user.id: {self.request.user.id}")
-        logger.debug(f"self.fields['b_object'].queryset_modified: {self.fields['b_object'].queryset}")
 
 
 # ------------------- validators ---------------------

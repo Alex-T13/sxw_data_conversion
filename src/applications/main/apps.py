@@ -24,7 +24,7 @@ def handle_uploaded_file(file, object_id: int):
     checking_row_0 = next(ws.values)
     logger.debug(f"row_0:{checking_row_0}")
     if checking_row_0 != ('NAIM', 'ED_IZM', 'KOL_VO', 'PRICE', 'COST'):
-        raise IndexError  # (+ TypeError) строки в конце
+        raise IndexError
 
     count_obj_db = int(ConstructionMaterial.objects.filter(building_object__id=object_id).count())
     logger.debug(f"count_obj_db: {count_obj_db}")
@@ -32,129 +32,184 @@ def handle_uploaded_file(file, object_id: int):
     materials = []
 
     for n, row in enumerate(ws.values, start=count_obj_db):
+        logger.debug(f"iteration: {n}")
         if row[0] is None:
             raise TypeError
         if row[2] is None:
             raise TypeError
         if row[4] is None:
             raise TypeError
-        # logger.debug(f"iteration: {n}")
-        # logger.debug(f"row[4]: {row[4]}")
-        # logger.debug(f"row[2]: {row[2]}")
+
         material = ConstructionMaterial(
             id_instance=n,
-            name=row[0],  # if row[1] is not None else beak
+            name=row[0],
             unit=row[1] if row[1] is not None else 'ШТ',
             quantity=row[2],
-            price=row[3] if row[3] is not None else round(row[4] / row[2], 5),
+            price=row[3] if row[3] is not None else Decimal('{:f}'.format(
+                (Decimal(row[4]) / Decimal(row[2])).quantize(Decimal('1.00000'), ROUND_HALF_UP).normalize())),
             total_cost=row[4],
             building_object_id=object_id,
         )
         materials.append(material)
 
     ConstructionMaterial.objects.bulk_create(materials[1:])
+    return True
 
 
-def create_xml(object_id: int, user_id: int):
+def create_xml(object_id: int, object_name: str, user_id: int):
     from xml.dom import minidom
+    data = get_data_for_xml(object_id)
 
     doc = minidom.Document()
-
     root = doc.createElement('root')
     doc.appendChild(root)
 
-    root1 = doc.createElement('root1')
-    root.appendChild(root1)
+    building = doc.createElement('stroyka')
+    building.setAttribute('version', '1.2')
+    building.setAttribute('prg', 'SXW')
+    building.setAttribute('ver_prg', '')
+    building.setAttribute('baza', '2017')
+    building.setAttribute('idobekt', '')
+    building.setAttribute('naim', '')
+    building.setAttribute('nachalo', '')
+    root.appendChild(building)
 
-    root2 = doc.createElement('root2')
-    root1.appendChild(root2)
+    obj_estimate = doc.createElement('ob_smeta')
+    obj_estimate.setAttribute('nomer', '1')
+    obj_estimate.setAttribute('naim', object_name)
+    building.appendChild(obj_estimate)
 
-    data = get_data_for_xml(object_id)
+    loc_estimate = doc.createElement('loc_smeta')
+    loc_estimate.setAttribute('nomer', '1')
+    loc_estimate.setAttribute('naim', object_name)
+    obj_estimate.appendChild(loc_estimate)
+
+    initial_data = doc.createElement('ishodnye_dannye')
+    initial_data.setAttribute('zona', '3')
+    initial_data.setAttribute('region', '7')
+    initial_data.setAttribute('mesyac_cen', '7')
+    initial_data.setAttribute('snds', '0')
+    initial_data.setAttribute('vid_ohr_pp', '11')
+    initial_data.setAttribute('stavka4', '6.94')
+    initial_data.setAttribute('kf_zu', '0.93')
+    initial_data.setAttribute('kf_vrem', '0.93')
+    initial_data.setAttribute('num_post', '0.93')
+    initial_data.setAttribute('kf_p4_ohr', '1')
+    initial_data.setAttribute('kf_p4_pp', '1')
+    loc_estimate.appendChild(initial_data)
+
+    total_coef_sxw = doc.createElement('totalKoefSXW')
+    loc_estimate.appendChild(total_coef_sxw)
+
+    coef_sxw = doc.createElement('koefSXW')
+    coef_sxw.setAttribute('idGrw', '1')
+    coef_sxw.setAttribute('kzpp', '1')
+    coef_sxw.setAttribute('keqip', '1')
+    coef_sxw.setAttribute('kmat', '1')
+    coef_sxw.setAttribute('ktrud', '1')
+    coef_sxw.setAttribute('ktrudm', '1')
+    coef_sxw.setAttribute('kzpp46', '1')
+    coef_sxw.setAttribute('keqip46', '1')
+    coef_sxw.setAttribute('kmat46', '1')
+    coef_sxw.setAttribute('ktrud46', '1')
+    coef_sxw.setAttribute('ktrudm46', '1')
+    coef_sxw.setAttribute('kzppm', '1')
+    coef_sxw.setAttribute('kmattr', '1')
+    coef_sxw.setAttribute('kzppm46', '1')
+    coef_sxw.setAttribute('kmattr46', '1')
+    coef_sxw.setAttribute('nak', '65.72')
+    coef_sxw.setAttribute('pln', '69.89')
+    coef_sxw.setAttribute('knak', '1')
+    coef_sxw.setAttribute('kpln', '1')
+    coef_sxw.setAttribute('knak2', '1')
+    coef_sxw.setAttribute('kpln2', '1')
+    coef_sxw.setAttribute('knak3', '1')
+    coef_sxw.setAttribute('kpln3', '1')
+    coef_sxw.setAttribute('knak4', '1')
+    coef_sxw.setAttribute('kpln4', '1')
+    total_coef_sxw.appendChild(coef_sxw)
 
     while True:
         try:
             next_data = next(data)
         except StopIteration:
-            logger.debug('StopIteration:')
+            logger.debug('StopIteration!')
             break
         else:
-            logger.debug(f"iteration: {next_data.id_instance}")
+            # logger.debug(f"iteration: {next_data.id_instance}")
 
-            rascenka = doc.createElement('rascenka')
-            rascenka.setAttribute('npp', next_data.id_instance)
-            rascenka.setAttribute('obosn', next_data.basis)
-            rascenka.setAttribute('naim', next_data.name)
-            rascenka.setAttribute('idGrw', '1')
-            rascenka.setAttribute('klv', str(next_data.quantity))
-            rascenka.setAttribute('ed_izm', next_data.unit)
-            rascenka.setAttribute('vid_ohr_pp', '11')  # the parameter will be fixed after import
-            rascenka.setAttribute('uniq_lab_ohr_pp', '1.1')  # the parameter will be fixed after import
-            rascenka.setAttribute('tip', '101')
-            rascenka.setAttribute('cena_0', str(next_data.unit_cost))
+            valuation = doc.createElement('rascenka')
+            valuation.setAttribute('npp', next_data.id_instance)
+            valuation.setAttribute('obosn', next_data.basis)
+            valuation.setAttribute('naim', next_data.name)
+            valuation.setAttribute('idGrw', '1')
+            valuation.setAttribute('klv', str(next_data.quantity))
+            valuation.setAttribute('ed_izm', next_data.unit)
+            valuation.setAttribute('vid_ohr_pp', '11')  # the parameter will be fixed after import
+            valuation.setAttribute('uniq_lab_ohr_pp', '1.1')  # the parameter will be fixed after import
+            valuation.setAttribute('tip', '101')
+            valuation.setAttribute('cena_0', str(next_data.unit_cost))
+            loc_estimate.appendChild(valuation)
 
-            # nabor_kf
-            nabor_kf = doc.createElement('nabor_kf')
-            rascenka.appendChild(nabor_kf)
+            set_coef = doc.createElement('nabor_kf')
+            valuation.appendChild(set_coef)
 
-            koef_1 = doc.createElement('koef_1')
-            koef_1.setAttribute('naim', '1-й коэффициент к расценке (справочно)')
-            koef_1.setAttribute('mat', '1')
-            koef_1.setAttribute('tr', '1')
-            nabor_kf.appendChild(koef_1)
+            coef_1 = doc.createElement('koef')
+            coef_1.setAttribute('naim', '1-й коэффициент к расценке (справочно)')
+            coef_1.setAttribute('mat', '1')
+            coef_1.setAttribute('tr', '1')
+            set_coef.appendChild(coef_1)
 
-            koef_2 = doc.createElement('koef_2')
-            koef_2.setAttribute('naim', '2-й коэффициент к расценке (справочно)')
-            koef_2.setAttribute('mat', '1')
-            koef_2.setAttribute('tr', '1')
-            nabor_kf.appendChild(koef_2)
+            coef_2 = doc.createElement('koef')
+            coef_2.setAttribute('naim', '2-й коэффициент к расценке (справочно)')
+            coef_2.setAttribute('mat', '1')
+            coef_2.setAttribute('tr', '1')
+            set_coef.appendChild(coef_2)
 
-            koef_3 = doc.createElement('koef_3')
-            koef_3.setAttribute('naim', '1-й коэффициент к расценке (справочно)')
-            koef_3.setAttribute('mat', '1')
-            koef_3.setAttribute('tr', '1')
-            nabor_kf.appendChild(koef_3)
+            coef_3 = doc.createElement('koef')
+            coef_3.setAttribute('naim', '1-й коэффициент к расценке (справочно)')
+            coef_3.setAttribute('mat', '1')
+            coef_3.setAttribute('tr', '1')
+            set_coef.appendChild(coef_3)
 
-            cena = doc.createElement('cena')
-            cena.setAttribute('mat', str(next_data.price))
-            cena.setAttribute('tr', str(next_data.unit_tr))  # the parameter will be fixed after import
-            cena.setAttribute('pryam', str(next_data.unit_cost))
-            cena.setAttribute('prc_ohr', '')  # the parameter will be fixed after import
-            cena.setAttribute('prc_pp', '')  # the parameter will be fixed after import
-            rascenka.appendChild(cena)
+            price = doc.createElement('cena')
+            price.setAttribute('mat', str(next_data.price))
+            price.setAttribute('tr', str(next_data.unit_tr))  # the parameter will be fixed after import
+            price.setAttribute('pryam', str(next_data.unit_cost))
+            price.setAttribute('prc_ohr', '')  # the parameter will be fixed after import
+            price.setAttribute('prc_pp', '')  # the parameter will be fixed after import
+            valuation.appendChild(price)
 
-            stoimost = doc.createElement('stoimost')
-            stoimost.setAttribute('mat', str(next_data.total_cost))
-            stoimost.setAttribute('tr', str(next_data.total_tr))  # the parameter will be fixed after import
-            stoimost.setAttribute('pryam', str(next_data.total_cost_total_tr))
-            stoimost.setAttribute('ohr', '0')
-            stoimost.setAttribute('pp', '0')
-            rascenka.appendChild(stoimost)
+            cost = doc.createElement('stoimost')
+            cost.setAttribute('mat', str(next_data.total_cost))
+            cost.setAttribute('tr', str(next_data.total_tr))  # the parameter will be fixed after import
+            cost.setAttribute('pryam', str(next_data.total_cost_total_tr))
+            cost.setAttribute('ohr', '0')
+            cost.setAttribute('pp', '0')
+            valuation.appendChild(cost)
 
             # materialy
-            materialy = doc.createElement('materialy')
-            rascenka.appendChild(materialy)
+            materials = doc.createElement('materialy')
+            valuation.appendChild(materials)
 
-            resurs = doc.createElement('resurs')
-            resurs.setAttribute('obosn', next_data.basis)
-            resurs.setAttribute('kodcic', '')
-            resurs.setAttribute('naim', next_data.name)
-            resurs.setAttribute('ed_izm', next_data.unit)
-            resurs.setAttribute('norma', '1')
-            resurs.setAttribute('klv', str(next_data.quantity))
-            resurs.setAttribute('cena_0', str(next_data.price))
-            resurs.setAttribute('stm_0', str(next_data.total_cost))
-            resurs.setAttribute('tr', str(next_data.unit_tr))
-            resurs.setAttribute('tr_rub', '0')
-            resurs.setAttribute('cena_tr', '2')  # the parameter will be fixed after import
-            materialy.appendChild(resurs)
-
-            root2.appendChild(rascenka)
+            resources = doc.createElement('resurs')
+            resources.setAttribute('obosn', next_data.basis)
+            resources.setAttribute('kodcic', '')
+            resources.setAttribute('naim', next_data.name)
+            resources.setAttribute('ed_izm', next_data.unit)
+            resources.setAttribute('norma', '1')
+            resources.setAttribute('klv', str(next_data.quantity))
+            resources.setAttribute('cena_0', str(next_data.price))
+            resources.setAttribute('stm_0', str(next_data.total_cost))
+            resources.setAttribute('tr', str(next_data.unit_tr))
+            resources.setAttribute('tr_rub', '0')
+            resources.setAttribute('cena_tr', '2')  # the parameter will be fixed after import
+            materials.appendChild(resources)
 
     xml_str = doc.toprettyxml(indent="  ")
 
     path = f"{settings.MEDIA_ROOT}/{user_id}/xml/"
-    file_name = f"Materials_obj{object_id}.xml"
-    file_path = f"{settings.MEDIA_ROOT}/{user_id}/xml/{file_name}"
+    file_path = f"{settings.MEDIA_ROOT}/{user_id}/xml/Materials.xml"
     if not os.path.exists(path):
         os.makedirs(path)
 
@@ -169,11 +224,11 @@ def get_data_for_xml(object_id: int,) -> DataForXML:
     for value in data_from_base:
         quantity = Decimal('{:f}'.format(Decimal(str(value.quantity)).normalize()))
         price = Decimal('{:f}'.format(Decimal(str(value.price)).normalize()))
-        unit_tr = (price * Decimal('0.02')).quantize(Decimal('1.00'), ROUND_HALF_UP)
-        total_tr = (unit_tr * quantity).quantize(Decimal('1.00'), ROUND_HALF_UP)
-        unit_cost = (price + unit_tr).quantize(Decimal('1.00'), ROUND_HALF_UP)
+        unit_tr = Decimal('{:f}'.format((price * Decimal('0.02')).quantize(Decimal('1.00'), ROUND_HALF_UP).normalize()))  # not '{:f}'
+        total_tr = Decimal('{:f}'.format((unit_tr * quantity).quantize(Decimal('1.00'), ROUND_HALF_UP).normalize()))  # not '{:f}'
+        unit_cost = Decimal('{:f}'.format((price + unit_tr).quantize(Decimal('1.00'), ROUND_HALF_UP).normalize()))  # not '{:f}'
         total_cost = Decimal('{:f}'.format(Decimal(str(value.total_cost)).normalize()))
-        total_cost_total_tr = (total_tr + total_cost).quantize(Decimal('1.00'), ROUND_HALF_UP)
+        total_cost_total_tr = Decimal('{:f}'.format((total_tr + total_cost).quantize(Decimal('1.00'), ROUND_HALF_UP).normalize()))  # not '{:f}'
 
         data_modified = DataForXML(
             id_instance=str(value.id_instance),
@@ -189,5 +244,4 @@ def get_data_for_xml(object_id: int,) -> DataForXML:
             total_cost=total_cost,
             total_cost_total_tr=total_cost_total_tr
         )
-
         yield data_modified

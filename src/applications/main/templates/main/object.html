@@ -1,34 +1,57 @@
 {% extends "_base.html" %}
 
 {% block content %}
-<table class="table table-hover ">  <!--  table-striped-->
-  <thead class="table-light">
-    <tr>   <!--  class="d-flex"-->
-      <th scope="col" class="text-center">№</th>  <!--  scope="col"   class="col-1"-->
-      <th scope="col" class="text-center">Наименование</th>
-      <th scope="col" class="text-center">Ед.изм.</th>
-      <th scope="col" class="text-center">Количество</th>
-      <th scope="col" class="text-center">Цена</th>
-      <th scope="col" class="text-center">Стоимость</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for mat in object_list %}
-      <tr>
-        <th scope="row" class="text-center">{{mat.id_instance}}</th>
-        <td>{{mat.name|truncatechars:100}}</td>
-        <td class="text-center">{{mat.unit}}</td>
-        <td class="text-end">{{mat.quantity|floatformat:"-5g"}}</td>
-        <td class="text-end">{{mat.price|floatformat:"-2g"}}</td>
-        <td class="text-end">{{mat.total_cost|floatformat:"-2g"}}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="4" class="text-center"><b>Всего материалов на сумму:</b></td>
-      <td colspan="2" class="text-end"><b>{{sum_mat|floatformat:"-2g"}}</b></td>
-  </tfoot>
-</table>
+{% if object_list%}
+<section>
+  <style>
+    .my-custom-scrollbar {
+      position: relative;
+      height: 600px;
+      overflow: auto;
+    }
+
+    .table-wrapper-scroll-y {
+      display: block;
+    }
+  </style>
+  <div class="table-wrapper-scroll-y my-custom-scrollbar">
+    <table class="table table-hover mb-0">  <!--  table-striped-->
+      <thead class="table-light">
+        <tr>
+          <th scope="col" class="text-center">№</th>
+          <th scope="col" class="text-center">Наименование</th>
+          <th scope="col" class="text-center">Ед.изм.</th>
+          <th scope="col" class="text-center">Количество</th>
+          <th scope="col" class="text-center">Цена</th>
+          <th scope="col" class="text-center">Стоимость</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for mat in object_list %}
+          <tr>
+            <th scope="row" class="text-center">{{mat.id_instance}}</th>
+            <td>{{mat.name|truncatechars:100}}</td>
+            <td class="text-center">{{mat.unit}}</td>
+            <td class="text-end">{{mat.quantity|floatformat:"-5g"}}</td>
+            <td class="text-end">{{mat.price|floatformat:"-2g"}}</td>
+            <td class="text-end">{{mat.total_cost|floatformat:"-2g"}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" class="text-center"><b>Всего материалов на сумму:</b></td>
+          <td colspan="2" class="text-end"><b>{{sum_mat|floatformat:"-2g"}}</b></td>
+      </tfoot>
+    </table>
+<!--    <div class="ps__rail-x" style="left: 0px; bottom: 0px;">-->
+<!--      <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>-->
+<!--    </div>-->
+<!--    <div class="ps__rail-y" style="top: 0px; height: 200px; right: 0px;">-->
+<!--      <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 102px;"></div>-->
+<!--    </div>-->
+  </div>
+</section>
+{% endif %}
 
 {% endblock %}

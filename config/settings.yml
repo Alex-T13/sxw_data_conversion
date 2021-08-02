@@ -13,7 +13,7 @@ default:
     - src
   DIRS_TEMPLATES:
     - src/applications/main/templates/
-#    - src/applications/hello/templates/
+    - src/applications/auth_reg/templates/
 #    - src/applications/landing/templates/
 #    - src/applications/onboarding/templates/
 #    - src/project/templates/
@@ -34,7 +34,7 @@ development:
   HOST: "localhost"
   PORT: 8000
   REQUEST_TTL: 300
-  SECRET_KEY: "12345"
+  SECRET_KEY: "KJHLKhlih_bLKHLOHjp_ojIL-+-80968758O-_gyUKVTdj-cljyfjytssssssr3@3ydsk"
   WEB_CONCURRENCY: 1
 
 

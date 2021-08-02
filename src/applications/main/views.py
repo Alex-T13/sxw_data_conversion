@@ -4,7 +4,7 @@ from typing import Dict
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Sum
-from django.http import HttpResponseNotFound, HttpResponse
+from django.http import HttpResponseNotFound, HttpResponse, Http404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, FormView
 
@@ -20,8 +20,8 @@ class MainHomeView(ExtendedDataContextMixin, ListView):
     template_name = 'main/index.html'
 
     def get_queryset(self):
-        return BuildingObject.objects.filter(user__id=self.request.user.id).annotate(num_material=Count(
-            'constructionmaterial')).order_by('-time_create')
+        return BuildingObject.objects.filter(
+            user__id=self.request.user.id).annotate(num_material=Count('constructionmaterial')).order_by('-time_create')
 
     def get_extended_context(self) -> Dict:
         context = {
@@ -30,7 +30,6 @@ class MainHomeView(ExtendedDataContextMixin, ListView):
         if self.request.user.is_authenticated:
             context['title'] = 'Список объектов:'
 
-        # logger.debug(f"self.object_list: {self.object_list}")
         if not self.object_list:
             context['title'] = 'У Вас пока нет созданных объектов.'
         return context
@@ -42,6 +41,8 @@ class ShowBuildingObjectView(LoginRequiredMixin, ExtendedDataContextMixin, ListV
     template_name = 'main/object.html'
 
     def get_queryset(self):
+        if not BuildingObject.objects.filter(id=self.kwargs['object_id']):
+            raise Http404("Страница не найдена")
         queryset = ConstructionMaterial.objects.filter(building_object__id=self.kwargs['object_id'])
         return queryset
 
@@ -55,15 +56,10 @@ class ShowBuildingObjectView(LoginRequiredMixin, ExtendedDataContextMixin, ListV
     def b_object_name(self):
         b_object_name = f'Список материалов по объекту: "{self.object_list[0].building_object}"' \
             if self.object_list else f'Нет материалов привязанных к этому объекту.'
-
-        # logger.debug(f"b_object_name: {b_object_name}")
         return b_object_name
 
     def sum_mat(self):
-        sum_mat = self.object_list.aggregate(sum_mat=Sum('total_cost')).get('sum_mat')
-
-        # logger.debug(f"sum_mat: {sum_mat}")
-        return sum_mat
+        return self.object_list.aggregate(sum_mat=Sum('total_cost')).get('sum_mat')
 
 
 class AddBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, CreateView):
@@ -72,12 +68,17 @@ class AddBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, CreateVie
     success_url = reverse_lazy('main')
     template_name = 'main/add_object.html'
 
-    def form_valid(self, form):
-        logger.debug(f"form.instance: {form.instance}")
+    def get_form_kwargs(self):
+        kwargs = super(AddBuildObjectView, self).get_form_kwargs()
+        kwargs.update({'request': self.request})
+        return kwargs
 
-        form.instance.user = self.request.user
-        logger.debug(f"form.instance.user: {form.instance.user}")
-        return super().form_valid(form)
+    # def form_valid(self, form):
+    #     # logger.debug(f"form.instance: {form.instance}")
+    #
+    #     form.instance.user = self.request.user
+    #     logger.debug(f"form.instance.user: {form.instance.user}")
+    #     return super().form_valid(form)
 
     def get_extended_context(self) -> Dict:
         context = {
@@ -176,7 +177,6 @@ class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
     login_url = reverse_lazy('login')
 
     form_class = SelectBuildObjectForm
-    # success_url = reverse_lazy('download', kwargs={'object_id': self.request.POST['b_object']})
     template_name = 'main/select_dl_obj.html'
 
     def get_form_kwargs(self):
