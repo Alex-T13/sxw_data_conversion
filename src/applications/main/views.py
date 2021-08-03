@@ -189,12 +189,11 @@ class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
         form = self.get_form(form_class)
 
         if form.is_valid():
-            logger.debug(f"self.request.POST['b_object']: {self.request.POST['b_object']}")
             object_id = self.request.POST['b_object']
-            logger.debug(f"self.request.user.id: {self.request.user.id}")
+            object_name = str(form.cleaned_data['b_object'])
             user_id = self.request.user.id
 
-            create_xml(object_id=object_id, user_id=user_id)
+            create_xml(object_id=object_id, object_name=object_name, user_id=user_id)
 
             return self.form_valid(form)
         else:
@@ -213,18 +212,15 @@ class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
 
 
 def download_xml(request, **kwargs):
-    object_id = kwargs['object_id']
-    logger.debug(f"kwargs['object_id']: {kwargs['object_id']}")
-
+    # object_id = kwargs['object_id']
     user_id = request.user.id
     logger.debug(f"request.user.id: {request.user.id}")
 
-    file_name = f"Materials_obj{object_id}.xml"
+    file_name = "Materials.xml"
     file_path = f"{settings.MEDIA_ROOT}/{user_id}/xml/{file_name}"
-
     if os.path.exists(file_path):
-        with open(file_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type='text/xml')
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='text/xml')
             response['Content-Disposition'] = f"attachment; filename= {os.path.basename(file_path)}"
             return response
 

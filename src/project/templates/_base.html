@@ -8,70 +8,98 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
 
     <title>{{ title }}</title>
   </head>
-  <body>
-    <div class="container">
-      {% block mainmenu %}
-        <header class="d-flex justify-content-center py-3 mb-4 border-bottom">
-          <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto">
-            <span class="fs-4">Привет всем!</span>
-          </div>
-          <ul class="nav nav-pills">
-            {% for m in mainmenu %}
-              {% if mainmenu_selected == m.title %}
-                <li class="nav-item">
-                  <a href="{% url m.url_name %}" class="nav-link active" aria-current="page">{{ m.title }}</a>
-                </li>
-              {% else %}
-                {% if forloop.last %}
-                  {% if request.user.is_authenticated %}
-                    <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
-                    <li class="nav-item" >
-                      <button type="button" class="btn btn-success" disabled>{{user.username}}</button>
-                    </li>
+<!--  <style>-->
+<!--    </style>-->
+  <body class="d-flex flex-column min-vh-100">
+    <div class="main">
+      <div class="container">
+        {% block mainmenu %}
+          <header class="d-flex justify-content-center py-3 mb-4 border-bottom">
+            <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto">
+              <span class="fs-4">Привет всем!</span>
+            </div>
+            <ul class="nav nav-pills">
+              {% for m in mainmenu %}
+                {% if mainmenu_selected == m.title %}
+                  <li class="nav-item">
+                    <a href="{% url m.url_name %}" class="nav-link active" aria-current="page">{{ m.title }}</a>
+                  </li>
+                {% else %}
+                  {% if forloop.last %}
+                    {% if request.user.is_authenticated %}
+                      <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
+                      <li class="nav-item" >
+                        <button type="button" class="btn btn-success" disabled>{{user.username}}</button>
+                      </li>
+                    {% else %}
+                      <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
+                    {% endif %}
                   {% else %}
                     <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
                   {% endif %}
-                {% else %}
-                  <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
-                {% endif %}
-              {% endif %}
-            {% endfor %}
-          </ul>
-        </header>
-      {% endblock mainmenu %}
-    </div>
-
-    <div class="container">
-      <div class="row">
-        <div class="col">
-          <div class="list-group">
-            {% block leftmenu %}
-              {% for m in leftmenu %}
-                {% if leftmenu_selected == m.title %}
-                  <a href="{% url m.url_name %}" class="list-group-item list-group-item-action active" aria-current="true">
-                    {{ m.title }}
-                  </a>
-                {% else %}
-                  <a href="{% url m.url_name %}" class="list-group-item list-group-item-action">{{ m.title }}</a>
                 {% endif %}
               {% endfor %}
-            {% endblock leftmenu %}
+            </ul>
+          </header>
+        {% endblock mainmenu %}
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <div class="list-group">
+              {% block leftmenu %}
+                {% for m in leftmenu %}
+                  {% if leftmenu_selected == m.title %}
+                    <a href="{% url m.url_name %}" class="list-group-item list-group-item-action active" aria-current="true">
+                      {{ m.title }}
+                    </a>
+                  {% else %}
+                    <a href="{% url m.url_name %}" class="list-group-item list-group-item-action">{{ m.title }}</a>
+                  {% endif %}
+                {% endfor %}
+              {% endblock leftmenu %}
+            </div>
           </div>
-        </div>
-        <div class="col-7">
-          <h2>{{ title }}</h2>
-          <br>
-          {% block content %}
-          {% endblock %}
-        </div>
-        <div class="col-2">
-          ля-ля-тополя
+          <div class="col-7">
+            <h2>{{ title }}</h2>
+            <br>
+            {% block content %}
+            {% endblock %}
+          </div>
+          <div class="col-2"></div>
         </div>
       </div>
     </div>
+
+    <div class="wrapper flex-grow-1"></div>
+
+    <footer class="footer">
+      <div class="container p-2" style="background-color: rgba(0, 0, 0, 0.2);">
+        <div class="row">
+          <div class="col-4">
+            <div class="text-start text-dark">
+              © 2021 Copyright: Alexander Tarletsky
+            </div>
+          </div>
+          <div class="col-8 text-end">
+            <a class="text-dark m-1" href="mailto:alexander.tarletsky@gmail.com" role="button" data-mdb-ripple-color="dark">
+              <i class="fas fa-envelope fa-lg"></i>
+            </a>
+            <a class="text-dark m-1" href="https://linkedin.com/in/alexander-tarletsky" role="button" data-mdb-ripple-color="dark">
+              <i class="fab fa-linkedin-in fa-lg"></i>
+            </a>
+            <a class="text-dark m-1" href="https://github.com/Alex-T13" role="button" data-mdb-ripple-color="dark">
+              <i class="fab fa-github fa-lg"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
 
 
 

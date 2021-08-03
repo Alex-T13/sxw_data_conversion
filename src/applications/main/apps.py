@@ -81,7 +81,7 @@ def create_xml(object_id: int, object_name: str, user_id: int):
 
     loc_estimate = doc.createElement('loc_smeta')
     loc_estimate.setAttribute('nomer', '1')
-    loc_estimate.setAttribute('naim', object_name)
+    loc_estimate.setAttribute('naim', '')
     obj_estimate.appendChild(loc_estimate)
 
     initial_data = doc.createElement('ishodnye_dannye')
@@ -98,37 +98,6 @@ def create_xml(object_id: int, object_name: str, user_id: int):
     initial_data.setAttribute('kf_p4_pp', '1')
     loc_estimate.appendChild(initial_data)
 
-    total_coef_sxw = doc.createElement('totalKoefSXW')
-    loc_estimate.appendChild(total_coef_sxw)
-
-    coef_sxw = doc.createElement('koefSXW')
-    coef_sxw.setAttribute('idGrw', '1')
-    coef_sxw.setAttribute('kzpp', '1')
-    coef_sxw.setAttribute('keqip', '1')
-    coef_sxw.setAttribute('kmat', '1')
-    coef_sxw.setAttribute('ktrud', '1')
-    coef_sxw.setAttribute('ktrudm', '1')
-    coef_sxw.setAttribute('kzpp46', '1')
-    coef_sxw.setAttribute('keqip46', '1')
-    coef_sxw.setAttribute('kmat46', '1')
-    coef_sxw.setAttribute('ktrud46', '1')
-    coef_sxw.setAttribute('ktrudm46', '1')
-    coef_sxw.setAttribute('kzppm', '1')
-    coef_sxw.setAttribute('kmattr', '1')
-    coef_sxw.setAttribute('kzppm46', '1')
-    coef_sxw.setAttribute('kmattr46', '1')
-    coef_sxw.setAttribute('nak', '65.72')
-    coef_sxw.setAttribute('pln', '69.89')
-    coef_sxw.setAttribute('knak', '1')
-    coef_sxw.setAttribute('kpln', '1')
-    coef_sxw.setAttribute('knak2', '1')
-    coef_sxw.setAttribute('kpln2', '1')
-    coef_sxw.setAttribute('knak3', '1')
-    coef_sxw.setAttribute('kpln3', '1')
-    coef_sxw.setAttribute('knak4', '1')
-    coef_sxw.setAttribute('kpln4', '1')
-    total_coef_sxw.appendChild(coef_sxw)
-
     while True:
         try:
             next_data = next(data)
@@ -137,12 +106,10 @@ def create_xml(object_id: int, object_name: str, user_id: int):
             break
         else:
             # logger.debug(f"iteration: {next_data.id_instance}")
-
             valuation = doc.createElement('rascenka')
             valuation.setAttribute('npp', next_data.id_instance)
             valuation.setAttribute('obosn', next_data.basis)
             valuation.setAttribute('naim', next_data.name)
-            valuation.setAttribute('idGrw', '1')
             valuation.setAttribute('klv', str(next_data.quantity))
             valuation.setAttribute('ed_izm', next_data.unit)
             valuation.setAttribute('vid_ohr_pp', '11')  # the parameter will be fixed after import
@@ -150,27 +117,6 @@ def create_xml(object_id: int, object_name: str, user_id: int):
             valuation.setAttribute('tip', '101')
             valuation.setAttribute('cena_0', str(next_data.unit_cost))
             loc_estimate.appendChild(valuation)
-
-            set_coef = doc.createElement('nabor_kf')
-            valuation.appendChild(set_coef)
-
-            coef_1 = doc.createElement('koef')
-            coef_1.setAttribute('naim', '1-й коэффициент к расценке (справочно)')
-            coef_1.setAttribute('mat', '1')
-            coef_1.setAttribute('tr', '1')
-            set_coef.appendChild(coef_1)
-
-            coef_2 = doc.createElement('koef')
-            coef_2.setAttribute('naim', '2-й коэффициент к расценке (справочно)')
-            coef_2.setAttribute('mat', '1')
-            coef_2.setAttribute('tr', '1')
-            set_coef.appendChild(coef_2)
-
-            coef_3 = doc.createElement('koef')
-            coef_3.setAttribute('naim', '1-й коэффициент к расценке (справочно)')
-            coef_3.setAttribute('mat', '1')
-            coef_3.setAttribute('tr', '1')
-            set_coef.appendChild(coef_3)
 
             price = doc.createElement('cena')
             price.setAttribute('mat', str(next_data.price))
@@ -206,15 +152,19 @@ def create_xml(object_id: int, object_name: str, user_id: int):
             resources.setAttribute('cena_tr', '2')  # the parameter will be fixed after import
             materials.appendChild(resources)
 
-    xml_str = doc.toprettyxml(indent="  ")
+    xml_str = doc.toprettyxml(indent=" ")
+    xml_str = xml_str[:-8]
 
     path = f"{settings.MEDIA_ROOT}/{user_id}/xml/"
-    file_path = f"{settings.MEDIA_ROOT}/{user_id}/xml/Materials.xml"
+    file_path_xml = f"{settings.MEDIA_ROOT}/{user_id}/xml/Materials.xml"
+    file_path_ref_part = f"{settings.MEDIA_ROOT}/_ref_part.txt"
     if not os.path.exists(path):
         os.makedirs(path)
 
-    with open(f"{file_path}", "w") as f:
-        f.write(xml_str)
+    with open(f"{file_path_xml}", "w") as f_xml, open(f"{file_path_ref_part}", "r") as f_ref_part:
+        f_xml.write(xml_str)
+        ref_part = f_ref_part.read()
+        f_xml.write(ref_part)
 
 
 def get_data_for_xml(object_id: int,) -> DataForXML:
@@ -228,7 +178,9 @@ def get_data_for_xml(object_id: int,) -> DataForXML:
         total_tr = Decimal('{:f}'.format((unit_tr * quantity).quantize(Decimal('1.00'), ROUND_HALF_UP).normalize()))  # not '{:f}'
         unit_cost = Decimal('{:f}'.format((price + unit_tr).quantize(Decimal('1.00'), ROUND_HALF_UP).normalize()))  # not '{:f}'
         total_cost = Decimal('{:f}'.format(Decimal(str(value.total_cost)).normalize()))
-        total_cost_total_tr = Decimal('{:f}'.format((total_tr + total_cost).quantize(Decimal('1.00'), ROUND_HALF_UP).normalize()))  # not '{:f}'
+        total_cost_total_tr = Decimal(
+            '{:f}'.format((total_tr + total_cost).quantize(Decimal('1.00'), ROUND_HALF_UP).normalize())
+        )  # not '{:f}'
 
         data_modified = DataForXML(
             id_instance=str(value.id_instance),
