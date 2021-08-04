@@ -6,6 +6,7 @@ default:
     - .pytest_cache
     - .static
     - .tests_artifacts
+    - .media
   DIRS_RESOURCES:
     - config
     - src/project/static/
@@ -34,7 +35,7 @@ development:
   HOST: "localhost"
   PORT: 8000
   REQUEST_TTL: 300
-  SECRET_KEY: "KJHLKhlih_bLKHLOHjp_ojIL-+-80968758O-_gyUKVTdj-cljyfjytssssssr3@3ydsk"
+  SECRET_KEY: "k1"
   WEB_CONCURRENCY: 1
 
 
@@ -42,7 +43,7 @@ ci:
   HOST: "localhost"
   PORT: 8000
   REQUEST_TTL: 100
-  SECRET_KEY: "1"
+  SECRET_KEY: "k1"
   TEST_BROWSER: "firefox"
   WEB_CONCURRENCY: 2
 heroku:

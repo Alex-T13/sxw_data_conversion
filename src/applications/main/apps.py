@@ -15,7 +15,7 @@ class MainConfig(AppConfig):
     name = f"applications.{label}"
 
 
-def handle_uploaded_file(file, object_id: int):
+def handle_uploaded_file(file, object_id: int) -> None:
     from applications.main.models import ConstructionMaterial
 
     wb = load_workbook(filename=file, data_only=True)
@@ -53,12 +53,17 @@ def handle_uploaded_file(file, object_id: int):
         materials.append(material)
 
     ConstructionMaterial.objects.bulk_create(materials[1:])
-    return True
 
 
-def create_xml(object_id: int, object_name: str, user_id: int):
+def create_xml(object_id: int, object_name: str, user_id: int) -> bool:
+    from applications.main.models import ConstructionMaterial
     from xml.dom import minidom
-    data = get_data_for_xml(object_id)
+
+    data_from_base = ConstructionMaterial.objects.filter(building_object__id=object_id)
+    if not data_from_base:
+        return False
+
+    data_for_xml = get_data_for_xml(data_from_base)
 
     doc = minidom.Document()
     root = doc.createElement('root')
@@ -93,16 +98,15 @@ def create_xml(object_id: int, object_name: str, user_id: int):
     initial_data.setAttribute('stavka4', '6.94')
     initial_data.setAttribute('kf_zu', '0.93')
     initial_data.setAttribute('kf_vrem', '0.93')
-    initial_data.setAttribute('num_post', '0.93')
+    initial_data.setAttribute('num_post', '')
     initial_data.setAttribute('kf_p4_ohr', '1')
     initial_data.setAttribute('kf_p4_pp', '1')
     loc_estimate.appendChild(initial_data)
 
     while True:
         try:
-            next_data = next(data)
+            next_data = next(data_for_xml)
         except StopIteration:
-            logger.debug('StopIteration!')
             break
         else:
             # logger.debug(f"iteration: {next_data.id_instance}")
@@ -134,7 +138,6 @@ def create_xml(object_id: int, object_name: str, user_id: int):
             cost.setAttribute('pp', '0')
             valuation.appendChild(cost)
 
-            # materialy
             materials = doc.createElement('materialy')
             valuation.appendChild(materials)
 
@@ -161,16 +164,15 @@ def create_xml(object_id: int, object_name: str, user_id: int):
     if not os.path.exists(path):
         os.makedirs(path)
 
-    with open(f"{file_path_xml}", "w") as f_xml, open(f"{file_path_ref_part}", "r") as f_ref_part:
-        f_xml.write(xml_str)
+    with open(f"{file_path_xml}", "w") as f_basic, open(f"{file_path_ref_part}", "r") as f_ref_part:
+        f_basic.write(xml_str)
         ref_part = f_ref_part.read()
-        f_xml.write(ref_part)
+        f_basic.write(ref_part)
+
+    return True
 
 
-def get_data_for_xml(object_id: int,) -> DataForXML:
-    from applications.main.models import ConstructionMaterial
-    data_from_base = ConstructionMaterial.objects.filter(building_object__id=object_id)
-
+def get_data_for_xml(data_from_base) -> DataForXML:
     for value in data_from_base:
         quantity = Decimal('{:f}'.format(Decimal(str(value.quantity)).normalize()))
         price = Decimal('{:f}'.format(Decimal(str(value.price)).normalize()))
@@ -181,7 +183,6 @@ def get_data_for_xml(object_id: int,) -> DataForXML:
         total_cost_total_tr = Decimal(
             '{:f}'.format((total_tr + total_cost).quantize(Decimal('1.00'), ROUND_HALF_UP).normalize())
         )  # not '{:f}'
-
         data_modified = DataForXML(
             id_instance=str(value.id_instance),
             basis=f"СЦЕН-МТ-00{value.id_instance}" if value.id_instance <= 9 else f"СЦЕН-МТ-0{value.id_instance}"

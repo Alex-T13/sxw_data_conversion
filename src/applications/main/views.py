@@ -193,7 +193,8 @@ class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
             object_name = str(form.cleaned_data['b_object'])
             user_id = self.request.user.id
 
-            create_xml(object_id=object_id, object_name=object_name, user_id=user_id)
+            if not create_xml(object_id=object_id, object_name=object_name, user_id=user_id):
+                return self.form_invalid(form)
 
             return self.form_valid(form)
         else:
