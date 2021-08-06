@@ -37,7 +37,7 @@ development:
   WEB_CONCURRENCY: 1
 
 heroku:
-  HOST: "sinkevich-data-conv.herokuapp.com/"
+  HOST: "sinkevich-data-conv.herokuapp.com"
   MODE_DEBUG: false
   REQUEST_TTL: 10
   VENV_SYNTHETIC: true
