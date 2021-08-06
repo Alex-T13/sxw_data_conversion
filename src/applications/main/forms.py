@@ -6,13 +6,17 @@ from framework.custom_logging import logger
 
 
 class AddBuildObjectForm(forms.ModelForm):
+    base = forms.CharField(
+        max_length=100, required=False, label='База расценок', widget=forms.TextInput(
+            attrs={'class': 'form-control', 'type': 'text', 'placeholder': '2017г.', 'disabled': ''}
+        )
+    )
 
     class Meta:
         model = BuildingObject
-        fields = ['name',]
+        fields = ['name', 'base']
         widgets = {
-            'name': forms.TextInput(attrs={"class": "form-control", "type": "text", "placeholder": "Название объекта"}),
-            # 'base': forms.TextInput(attrs={"class": "form-control", "type": "text", "disabled": ""}),
+            'name': forms.TextInput(attrs={"class": 'form-control', 'type': 'text', 'placeholder': "Название объекта"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -25,7 +29,7 @@ class AddBuildObjectForm(forms.ModelForm):
         super(AddBuildObjectForm, self).clean()
         count_obj = BuildingObject.objects.filter(user__id=self.request.user.id).count()
         if count_obj >= 5:
-            raise forms.ValidationError('Вы больше не можете создавать объекты. Вы достигли максимального колличества.',
+            raise forms.ValidationError("Вы больше не можете создавать объекты. Вы достигли максимального колличества.",
                                         code='overflow')
 
 
@@ -71,7 +75,8 @@ class AddMaterialsForm(forms.Form):
         if not file.create_obj_list(object_id):
             raise forms.ValidationError("""Данные в файле заполнены не верно. Возможно есть пропущенные пустые ячейки.
                                         Обратитесь к разделу 'Помощь'. (Попробуйте удалить несколько пустых строк в 
-                                        конце файла или создать новый файл и скопировать данные в него.)""", code='type_error')
+                                        конце файла или создать новый файл и скопировать данные в него.)""",
+                                        code='type_error')
         if not file.save_in_db():
             raise forms.ValidationError("""При сохранении данных что-то пошло не так. Возможно проблема
                                         кроется в структуре данных Вашего исходного файла. Вы можете оставить сообщение 
@@ -89,7 +94,6 @@ class SelectBuildObjectForm(forms.Form):
         self.request = kwargs.pop("request")
         super(SelectBuildObjectForm, self).__init__(*args, **kwargs)
         self.fields['b_object'].queryset = BuildingObject.objects.filter(user__id=self.request.user.id)
-
 
 # ------------------- validators ---------------------
 
