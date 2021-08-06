@@ -1,1 +1,1 @@
-web: gunicorn --config=scripts/gunicorn.conf.py" project.wsgi:application
+web: gunicorn --config="scripts/gunicorn.conf.py" project.wsgi:application
