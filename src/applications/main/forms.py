@@ -1,5 +1,4 @@
 from django import forms
-from django.db import IntegrityError
 
 from applications.main.apps import UploadedFileObject
 from applications.main.models import BuildingObject
@@ -10,10 +9,10 @@ class AddBuildObjectForm(forms.ModelForm):
 
     class Meta:
         model = BuildingObject
-        fields = ['name', 'base']
+        fields = ['name',]
         widgets = {
             'name': forms.TextInput(attrs={"class": "form-control", "type": "text", "placeholder": "Название объекта"}),
-            'base': forms.TextInput(attrs={"class": "form-control", "type": "text", "disabled": ""}),
+            # 'base': forms.TextInput(attrs={"class": "form-control", "type": "text", "disabled": ""}),
         }
 
     def __init__(self, *args, **kwargs):
