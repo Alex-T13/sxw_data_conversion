@@ -1,12 +1,12 @@
 import os
-import sys
+# import sys
+#
+# import six
 
-import six
-
-if six.PY2:
-    pass
-else:
-    from urllib.parse import urlsplit
+# if six.PY2:
+#     pass
+# else:
+#     from urllib.parse import urlsplit
 
 
 def get_setting(setting_name, default=None, convert=lambda _value: _value or None):
