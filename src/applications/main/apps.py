@@ -1,8 +1,11 @@
 from decimal import Decimal, ROUND_HALF_UP
 import os
+from typing import List, Optional
+from xml.dom import minidom
 
 from django.apps import AppConfig
 from django.conf import settings
+from django.db import DatabaseError
 
 from openpyxl import load_workbook
 
@@ -15,49 +18,59 @@ class MainConfig(AppConfig):
     name = f"applications.{label}"
 
 
-def handle_uploaded_file(file, object_id: int) -> None:
-    from applications.main.models import ConstructionMaterial
+class UploadedFileObject:
+    def __init__(self, file):
+        from applications.main.models import ConstructionMaterial
+        self._ConstructionMaterial = ConstructionMaterial
+        self.wb = load_workbook(filename=file, data_only=True)
+        self.ws = self.wb.active
+        self.checking_row_0 = next(self.ws.values)
+        self.material_list = None
 
-    wb = load_workbook(filename=file, data_only=True)
-    ws = wb.active
+    def check_row_0(self) -> bool:
+        if self.checking_row_0 != ('NAIM', 'ED_IZM', 'KOL_VO', 'PRICE', 'COST'):
+            return False
+        return True
 
-    checking_row_0 = next(ws.values)
-    logger.debug(f"row_0:{checking_row_0}")
-    if checking_row_0 != ('NAIM', 'ED_IZM', 'KOL_VO', 'PRICE', 'COST'):
-        raise IndexError
+    def create_obj_list(self, object_id: int) -> Optional[List]:
+        count_obj_db = int(self._ConstructionMaterial.objects.filter(building_object__id=object_id).count())
+        materials = []
+        for n, row in enumerate(self.ws.values, start=count_obj_db):
+            # logger.debug(f"n: {n}")
+            if row[0] is None:
+                return None
+            if row[2] is None:
+                return None
+            if row[4] is None:
+                return None
 
-    count_obj_db = int(ConstructionMaterial.objects.filter(building_object__id=object_id).count())
-    logger.debug(f"count_obj_db: {count_obj_db}")
+            material = self._ConstructionMaterial(
+                id_instance=n,
+                name=row[0],
+                unit=row[1] if row[1] is not None else 'ШТ',
+                quantity=row[2],
+                price=row[3] if row[3] is not None else Decimal('{:f}'.format(
+                    (Decimal(row[4]) / Decimal(row[2])).quantize(Decimal('1.00000'), ROUND_HALF_UP).normalize())),
+                total_cost=row[4],
+                building_object_id=object_id,
+            )
+            materials.append(material)
+        self.material_list = materials[1:]
+        return self.material_list
 
-    materials = []
-
-    for n, row in enumerate(ws.values, start=count_obj_db):
-        logger.debug(f"iteration: {n}")
-        if row[0] is None:
-            raise TypeError
-        if row[2] is None:
-            raise TypeError
-        if row[4] is None:
-            raise TypeError
-
-        material = ConstructionMaterial(
-            id_instance=n,
-            name=row[0],
-            unit=row[1] if row[1] is not None else 'ШТ',
-            quantity=row[2],
-            price=row[3] if row[3] is not None else Decimal('{:f}'.format(
-                (Decimal(row[4]) / Decimal(row[2])).quantize(Decimal('1.00000'), ROUND_HALF_UP).normalize())),
-            total_cost=row[4],
-            building_object_id=object_id,
-        )
-        materials.append(material)
-
-    ConstructionMaterial.objects.bulk_create(materials[1:])
+    def save_in_db(self) -> bool:
+        try:
+            save = self._ConstructionMaterial.objects.bulk_create(self.material_list)
+        except DatabaseError:
+            return False
+        else:
+            if save:
+                return True
+            return False
 
 
 def create_xml(object_id: int, object_name: str, user_id: int) -> bool:
     from applications.main.models import ConstructionMaterial
-    from xml.dom import minidom
 
     data_from_base = ConstructionMaterial.objects.filter(building_object__id=object_id)
     if not data_from_base:

@@ -15,37 +15,27 @@ default:
   DIRS_TEMPLATES:
     - src/applications/main/templates/
     - src/applications/auth_reg/templates/
-#    - src/applications/landing/templates/
-#    - src/applications/onboarding/templates/
-#    - src/project/templates/
   HOST: ""
   MODE_DEBUG: true
   MODE_PROFILING: false
   PORT: 8000
   PROJECT_NAME: "sinkevich_data_conv"
   REQUEST_TTL: 0
-  SECRET_KEY: ""
+
   SENTRY_DSN: ""
   TEMPLATE_ENGINE: "Django"
   TEST_BROWSER: ""
   TEST_BROWSER_HEADLESS: true
   VENV_SYNTHETIC: false
   WEB_CONCURRENCY: 0
+
 development:
   HOST: "localhost"
   PORT: 8000
   REQUEST_TTL: 300
-  SECRET_KEY: "k1"
+
   WEB_CONCURRENCY: 1
 
-
-ci:
-  HOST: "localhost"
-  PORT: 8000
-  REQUEST_TTL: 100
-  SECRET_KEY: "k1"
-  TEST_BROWSER: "firefox"
-  WEB_CONCURRENCY: 2
 heroku:
   HOST: ""
   MODE_DEBUG: false

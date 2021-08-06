@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 import dj_database_url
 import sentry_sdk
-# from django.urls import reverse_lazy
 from dynaconf import settings as dyn
 
 
@@ -17,6 +16,7 @@ _this_file = Path(__file__).resolve()
 DIR_PROJECT = _this_file.parent.resolve()
 DIR_SRC = DIR_PROJECT.parent.resolve()
 DIR_REPO = DIR_SRC.parent.resolve()
+
 SECRET_KEY = dyn.SECRET_KEY
 
 ALLOWED_HOSTS = [
@@ -111,7 +111,7 @@ if DEBUG:
 
 LANGUAGE_CODE = 'ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Minsk'  # UTC
 
 USE_I18N = True
 

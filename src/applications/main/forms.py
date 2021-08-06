@@ -1,7 +1,7 @@
 from django import forms
 from django.db import IntegrityError
 
-from applications.main.apps import handle_uploaded_file
+from applications.main.apps import UploadedFileObject
 from applications.main.models import BuildingObject
 from framework.custom_logging import logger
 
@@ -32,7 +32,7 @@ class AddBuildObjectForm(forms.ModelForm):
 
 class AddMaterialsForm(forms.Form):
     data = forms.FileField(
-        max_length=100, label='Файл для загрузки (*.xlsx)', widget=forms.FileInput(
+        max_length=100, label="Файл для загрузки (*.xlsx)", widget=forms.FileInput(
             attrs={'class': 'form-control', 'type': 'file', 'id': 'formFile'}
         )
     )
@@ -43,20 +43,17 @@ class AddMaterialsForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop("request")
+        self.request = kwargs.pop('request')
         super(AddMaterialsForm, self).__init__(*args, **kwargs)
-
         self.fields['b_object'].queryset = BuildingObject.objects.filter(user__id=self.request.user.id)
-        logger.debug(f"request.user.id: {self.request.user.id}")
-        logger.debug(f"self.fields['b_object'].queryset_modified: {self.fields['b_object'].queryset}")
 
     def clean_data(self):
         data = self.cleaned_data['data']
         logger.debug(f"Content_type: {data.content_type}")
-        if data.content_type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-            raise forms.ValidationError('Не верный формат файла, должен быть *.xlsx', code='invalid_content_type')
+        if data.content_type != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+            raise forms.ValidationError("Не верный формат файла, должен быть *.xlsx", code='invalid_content_type')
         if data.size > 2621440:
-            raise forms.ValidationError('Файл слишком велик.', code='large')
+            raise forms.ValidationError("Файл слишком велик.", code='big_size')
         return data
 
     def clean(self):
@@ -64,21 +61,22 @@ class AddMaterialsForm(forms.Form):
         try:
             data = self.cleaned_data['data']
         except KeyError:
-            raise forms.ValidationError('Файл не загружается. С ним что-то не так. Смотрите справку.', code='key_error')
-        object_id = self.cleaned_data['b_object'].id
-        logger.debug(f"object_id: {object_id}")
+            raise forms.ValidationError("""Файл не загружается. С ним что-то не так. Обратитесь к разделу 'Помощь'
+                                        или оставьте сообщение в разделе 'Отзывы и предложения'""", code='key_error')
 
-        try:
-            handle_uploaded_file(data, object_id)
-        except IndexError:
-            raise forms.ValidationError('Структура файла не соответствует шаблону. Смотрите справку.', code='index')
-        except TypeError:
-            raise forms.ValidationError('Данные в файле заполнены не верно. Возможно есть пропущенные пустые ячейки. '
-                                        'Смотрите справку. (Попробуйте удалить несколько пустых строк в конце файла '
-                                        'или создать новый файл и скопировать данные в него.)', code='type_error')
-        except IntegrityError:
-            raise forms.ValidationError('При сохранении данных что-то пошло не так. Возможно проблема '
-                                        'кроется в структуре данных Вашего исходного файла.', code='dbase_error')
+        object_id = self.cleaned_data['b_object'].id
+        file = UploadedFileObject(data)
+
+        if not file.check_row_0():
+            raise forms.ValidationError("Структура файла не соответствует шаблону. Смотрите справку.", code='index')
+        if not file.create_obj_list(object_id):
+            raise forms.ValidationError("""Данные в файле заполнены не верно. Возможно есть пропущенные пустые ячейки.
+                                        Обратитесь к разделу 'Помощь'. (Попробуйте удалить несколько пустых строк в 
+                                        конце файла или создать новый файл и скопировать данные в него.)""", code='type_error')
+        if not file.save_in_db():
+            raise forms.ValidationError("""При сохранении данных что-то пошло не так. Возможно проблема
+                                        кроется в структуре данных Вашего исходного файла. Вы можете оставить сообщение 
+                                        в разделе 'Отзывы и предложения'""", code='dbase_error')
 
 
 class SelectBuildObjectForm(forms.Form):
