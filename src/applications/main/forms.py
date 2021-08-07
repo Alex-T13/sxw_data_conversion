@@ -68,11 +68,11 @@ class AddMaterialsForm(forms.Form):
                                         или оставьте сообщение в разделе 'Отзывы и предложения'""", code='key_error')
 
         object_id = self.cleaned_data['b_object'].id
-        file = UploadedFileObject(data)
+        file = UploadedFileObject(data, object_id)
 
         if not file.check_row_0():
             raise forms.ValidationError("Структура файла не соответствует шаблону. Смотрите справку.", code='index')
-        if not file.create_obj_list(object_id):
+        if not file.create_obj_list():
             raise forms.ValidationError("""Данные в файле заполнены не верно. Возможно есть пропущенные пустые ячейки.
                                         Обратитесь к разделу 'Помощь'. (Попробуйте удалить несколько пустых строк в 
                                         конце файла или создать новый файл и скопировать данные в него.)""",
@@ -94,6 +94,7 @@ class SelectBuildObjectForm(forms.Form):
         self.request = kwargs.pop("request")
         super(SelectBuildObjectForm, self).__init__(*args, **kwargs)
         self.fields['b_object'].queryset = BuildingObject.objects.filter(user__id=self.request.user.id)
+
 
 # ------------------- validators ---------------------
 

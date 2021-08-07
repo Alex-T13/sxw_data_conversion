@@ -8,7 +8,7 @@ from django.http import HttpResponseNotFound, HttpResponse, Http404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, FormView
 
-from applications.main.apps import create_xml
+from applications.main.apps import FileXML
 from applications.main.forms import AddBuildObjectForm, AddMaterialsForm, SelectBuildObjectForm
 from applications.main.models import BuildingObject, ConstructionMaterial
 from framework.custom_logging import logger
@@ -192,8 +192,9 @@ class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
             object_id = self.request.POST['b_object']
             object_name = str(form.cleaned_data['b_object'])
             user_id = self.request.user.id
+            create_xml = FileXML(object_id=object_id, object_name=object_name, user_id=user_id)
 
-            if not create_xml(object_id=object_id, object_name=object_name, user_id=user_id):
+            if not create_xml.save_xml_file():
                 return self.form_invalid(form)
 
             return self.form_valid(form)
@@ -215,7 +216,7 @@ class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
 def download_xml(request, **kwargs):
     # object_id = kwargs['object_id']
     user_id = request.user.id
-    logger.debug(f"request.user.id: {request.user.id}")
+    # logger.debug(f"request.user.id: {request.user.id}")
 
     file_name = "Materials.xml"
     file_path = f"{settings.MEDIA_ROOT}/{user_id}/xml/{file_name}"
