@@ -29,7 +29,7 @@ class AddBuildObjectForm(forms.ModelForm):
         super(AddBuildObjectForm, self).clean()
         count_obj = BuildingObject.objects.filter(user__id=self.request.user.id).count()
         if count_obj >= 5:
-            raise forms.ValidationError("Вы больше не можете создавать объекты. Вы достигли максимального колличества.",
+            raise forms.ValidationError("Вы больше не можете создавать объекты. Вы достигли максимального количества.",
                                         code='overflow')
 
 
