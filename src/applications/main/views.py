@@ -42,7 +42,7 @@ class ShowBuildingObjectView(LoginRequiredMixin, ExtendedDataContextMixin, ListV
 
     def get_queryset(self):
         if not BuildingObject.objects.filter(id=self.kwargs['object_id']):
-            raise Http404("Страница не найдена")
+            raise Http404("Страница не найдена")  # HttpResponseNotFound
         queryset = ConstructionMaterial.objects.filter(building_object__id=self.kwargs['object_id'])
         return queryset
 
@@ -72,13 +72,6 @@ class AddBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, CreateVie
         kwargs = super(AddBuildObjectView, self).get_form_kwargs()
         kwargs.update({'request': self.request})
         return kwargs
-
-    # def form_valid(self, form):
-    #     # logger.debug(f"form.instance: {form.instance}")
-    #
-    #     form.instance.user = self.request.user
-    #     logger.debug(f"form.instance.user: {form.instance.user}")
-    #     return super().form_valid(form)
 
     def get_extended_context(self) -> Dict:
         context = {
@@ -178,6 +171,7 @@ class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
 
     form_class = SelectBuildObjectForm
     template_name = 'main/select_dl_obj.html'
+    success_url = reverse_lazy('download')
 
     def get_form_kwargs(self):
         kwargs = super(SelectDLObjectView, self).get_form_kwargs()
@@ -208,16 +202,9 @@ class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
         }
         return context
 
-    def get_success_url(self):
-        object_id = self.request.POST['b_object']
-        return reverse_lazy('download', kwargs={'object_id': object_id})
 
-
-def download_xml(request, **kwargs):
-    # object_id = kwargs['object_id']
+def download_xml(request):
     user_id = request.user.id
-    # logger.debug(f"request.user.id: {request.user.id}")
-
     file_name = "Materials.xml"
     file_path = f"{settings.MEDIA_ROOT}/{user_id}/xml/{file_name}"
     if os.path.exists(file_path):
@@ -225,6 +212,8 @@ def download_xml(request, **kwargs):
             response = HttpResponse(f.read(), content_type='text/xml')
             response['Content-Disposition'] = f"attachment; filename= {os.path.basename(file_path)}"
             return response
+    logger.debug("Directory or file does not exist")
+    return HttpResponseNotFound
 
 
 # def pageNotFound(request, exception):
