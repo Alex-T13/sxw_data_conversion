@@ -1,7 +1,6 @@
 from django.urls import path
 
 from applications.main import views
-# from applications.main.views import pageNotFound
 
 urlpatterns = [
     path('', views.MainHomeView.as_view(), name='main'),
@@ -13,7 +12,4 @@ urlpatterns = [
     path('select_dl_obj/', views.SelectDLObjectView.as_view(), name='select_dl_obj'),
     path('download/', views.download_xml, name='download'),
     path('help/', views.MainHomeView.as_view(), name='help'),
-    path('reviews/', views.MainHomeView.as_view(), name='reviews'),
 ]
-
-# handler404 = pageNotFound

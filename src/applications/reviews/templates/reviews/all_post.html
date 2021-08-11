@@ -1,0 +1,47 @@
+{% extends "_base.html" %}
+
+{% block content %}
+  {% if object_list%}
+    {% for obj in object_list %}
+      <div class="container">
+        <div class="row">
+          <div class="col-9">
+
+          </div>
+          <div class="col">
+            {{obj.create|date:"d-m-Y H:i:s"}}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-10">
+            <br>
+            {{obj.content|truncatechars:250}}
+            (широкая) (ляля) (широкая) (ляля) (широкая) (ляля) (широкая) (ляля) (широкая) (ляля) (широкая) (ляля)
+            (широкая) (ляля) (широкая) (ляля) (широкая) (ляля) (широкая) (ляля) (широкая) (ляля) (ляля) (ляля) (ляля) ла
+          </div>
+          <div class="col"></div>
+        </div>
+        <div class="row">
+          <div class="col-9">
+            <br>
+            <button type="button" class="btn btn-outline-primary btn-sm">Редактировать</button>
+          </div>
+          <div class="col">
+            <br>
+            <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Изменён</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <hr>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+  {% if request.user.is_authenticated %}
+      <br><br>
+      <button type="submit" class="btn btn-primary">Написать сообщение</button>
+  {% endif %}
+
+{% endblock %}

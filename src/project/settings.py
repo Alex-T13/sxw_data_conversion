@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # -------------------------------
     'applications.main.apps.MainConfig',
     'applications.auth_reg.apps.AuthRegConfig',
+    'applications.reviews.apps.ReviewConfig',
 
 
 ]
