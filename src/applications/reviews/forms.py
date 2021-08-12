@@ -1,8 +1,14 @@
 from django import forms
 
-from applications.main.apps import UploadedFileObject
-from applications.main.models import BuildingObject
+from applications.reviews.models import Post
 from framework.custom_logging import logger
+
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ["content"]
+        widgets = {"content": forms.Textarea(attrs={'class': 'form-control', 'rows': '4'})}
 
 
 # class AddBuildObjectForm(forms.ModelForm):

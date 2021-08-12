@@ -8,7 +8,7 @@ User = get_user_model()
 
 class Post(models.Model):
 
-    content = models.TextField(verbose_name='Сообщение')
+    content = models.TextField(max_length=700, verbose_name='Сообщение')
     create = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     edited = models.BooleanField(default=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')

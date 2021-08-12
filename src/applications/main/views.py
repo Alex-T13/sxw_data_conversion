@@ -104,7 +104,7 @@ class UploadFormView(LoginRequiredMixin, ExtendedDataContextMixin, FormView):
         return reverse_lazy('object', kwargs={'object_id': object_id})
 
 
-class CleanBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView, ):
+class CleanBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView):
     login_url = reverse_lazy('login')
 
     form_class = SelectBuildObjectForm
@@ -135,7 +135,7 @@ class CleanBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormVie
         return context
 
 
-class DelBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,):
+class DelBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView):
     login_url = reverse_lazy('login')
 
     form_class = SelectBuildObjectForm
@@ -166,7 +166,7 @@ class DelBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,
         return context
 
 
-class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView,):
+class SelectDLObjectView(LoginRequiredMixin, ExtendedDataContextMixin, FormView):
     login_url = reverse_lazy('login')
 
     form_class = SelectBuildObjectForm
