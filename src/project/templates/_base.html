@@ -30,7 +30,7 @@
                   </li>
                 {% else %}
                   {% if forloop.last %}
-                    {% if request.user.is_authenticated %}
+                    {% if user.is_authenticated %}
                       <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
                       <li class="nav-item" >
                         <button type="button" class="btn btn-outline-dark" disabled>{{user.username|truncatechars:20}}</button>

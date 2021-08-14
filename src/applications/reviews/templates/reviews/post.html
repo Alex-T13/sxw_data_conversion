@@ -1,0 +1,35 @@
+{% extends "_base.html" %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        Пост: {{object.author}} | {{object.create|date:"d-m-Y H:i:s"}}
+      </div>
+<!--          <div class="col"></div>-->
+    </div>
+    <div class="row">
+      <div class="col-10"><br>{{object.content}}</div>
+      <div class="col"></div>
+    </div>
+    <div class="row">
+      <div class="col-9">
+        <br>
+        {% if obj.author == user %}
+          <a class="btn btn-outline-primary btn-sm" href="#" role="button">Редактировать</a>
+        {% endif %}
+          <a class="btn btn-outline-primary btn-sm" href="#" role="button">Редактировать</a>
+      </div>
+      <div class="col">
+<!--        <br>-->
+<!--        <button type="button" class="btn btn-outline-secondary btn-sm" disabled>Изменён</button>-->
+      </div>
+    </div>
+<!--    <div class="row">-->
+<!--      <div class="col-12">-->
+<!--        <hr>-->
+<!--      </div>-->
+<!--    </div>-->
+  </div>
+
+{% endblock %}

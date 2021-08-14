@@ -1,7 +1,8 @@
+
+
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.urls import reverse_lazy
-
+from django.urls import reverse_lazy, reverse
 
 User = get_user_model()
 
@@ -18,7 +19,7 @@ class Post(models.Model):
         return self.content
 
     def get_absolute_url(self):
-        return reverse_lazy('object', kwargs={'pk': self.pk})
+        return reverse_lazy('post', kwargs={'pk': self.pk})
 
     class Meta:
         verbose_name = 'Сообщение'
