@@ -1,7 +1,7 @@
 from django import forms
 
 from applications.main.apps import UploadedFileObject
-from applications.main.models import BuildingObject
+from applications.main.models import BuildingObject, ConstructionMaterial
 from framework.custom_logging import logger
 
 
@@ -23,6 +23,8 @@ class AddBuildObjectForm(forms.ModelForm):
         self.request = kwargs.pop("request")
         super(AddBuildObjectForm, self).__init__(*args, **kwargs)
         self.instance.user = self.request.user
+        count_obj_db = int(BuildingObject.objects.filter(user__id=self.instance.user.id).count())
+        self.instance.id_instance = count_obj_db + 1
         logger.debug(f"self.instance.user: {self.instance.user}")
 
     def clean(self):
@@ -66,6 +68,10 @@ class AddMaterialsForm(forms.Form):
         except KeyError:
             raise forms.ValidationError("""Файл не загружается. С ним что-то не так. Обратитесь к разделу 'Помощь'
                                         или оставьте сообщение в разделе 'Отзывы и предложения'""", code='key_error')
+
+        if ConstructionMaterial.objects.filter(building_object__user__id=self.request.user.id).count() >= 2000:
+            raise forms.ValidationError("Вы больше не можете добавлять материалы. Вы достигли максимального количества.",
+                                        code='overflow')
 
         object_id = self.cleaned_data['b_object'].id
         file = UploadedFileObject(data, object_id)

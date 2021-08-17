@@ -31,7 +31,7 @@
           </div>
           <div class="col text-end">
             <small>
-              {{obj.author}} | {{obj.create|date:"d-m-Y H:i:s"}}
+              {{obj.author|truncatechars:20}} | {{obj.create|date:"d-m-Y H:i:s"}}
             </small>
           </div>
         </div>
@@ -46,10 +46,10 @@
           <div class="col-9">
             <br>
             {% if obj.content|length > 250 %}
-                <a class="btn btn-outline-primary btn-sm" href="{{ obj.get_absolute_url }}" role="button">Весь пост</a>
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'post' obj.id %}" role="button">Весь пост</a>
             {% endif %}
             {% if obj.author == user %}
-              <button type="button" class="btn btn-outline-primary btn-sm">Редактировать</button>
+              <a class="btn btn-outline-success btn-sm" href="{% url 'update_post' obj.id %}" role="button">Редактировать</a>
             {% endif %}
           </div>
           <div class="col">

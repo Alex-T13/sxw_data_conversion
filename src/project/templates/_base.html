@@ -31,7 +31,9 @@
                 {% else %}
                   {% if forloop.last %}
                     {% if user.is_authenticated %}
-                      <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
+                      <li class="nav-item" >
+                        <a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a>
+                      </li>
                       <li class="nav-item" >
                         <button type="button" class="btn btn-outline-dark" disabled>{{user.username|truncatechars:20}}</button>
                       </li>
@@ -39,7 +41,9 @@
                       <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
                     {% endif %}
                   {% else %}
-                    <li class="nav-item" ><a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a></li>
+                    <li class="nav-item" >
+                      <a href="{% url m.url_name %}" class="nav-link">{{ m.title }}</a>
+                    </li>
                   {% endif %}
                 {% endif %}
               {% endfor %}

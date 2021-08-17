@@ -14,13 +14,10 @@ class ShowPostView(LoginRequiredMixin, ExtendedDataContextMixin, DetailView):
     login_url = reverse_lazy('login')
     model = Post
     template_name = "reviews/post.html"
-    # pk_url_kwarg = 'post_id'
 
     def get_extended_context(self) -> Dict:
         context = {
-            'title': 'Скачать данные объекта (xml):',
-            'mainmenu_selected': 'Объекты',
-            'leftmenu_selected': 'Скачать данные объекта (xml)',
+            'title': 'Детализация поста',
         }
         return context
 
@@ -32,7 +29,7 @@ class AllPostView(ExtendedDataContextMixin, ListView):
     def get_extended_context(self) -> Dict:
         context = {
             'mainmenu_selected': "Отзывы и предложения",
-            'title': "Напишите свой отзыв:",
+            'title': "Оставить отзыв",
             'form': PostForm()
         }
         return context
@@ -50,11 +47,19 @@ class AddPostView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class UpdatePostView(ExtendedDataContextMixin, UpdateView):
-    pass
+class UpdatePostView(LoginRequiredMixin, ExtendedDataContextMixin, UpdateView):
+    login_url = reverse_lazy('login')
+    model = Post
+    form_class = PostForm
+    template_name = "reviews/update_post.html"
+    success_url = reverse_lazy('reviews')
+
+    def form_valid(self, form):
+        self.object.edited = True
+        return super().form_valid(form)
 
     def get_extended_context(self) -> Dict:
         context = {
-            'title': "?????????????",
+            'title': "Редактирование поста",
         }
         return context

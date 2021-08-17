@@ -15,7 +15,10 @@
       <tbody>
         {% for obj in object_list %}
           <tr style="transform: rotate(0);">
-            <th scope="row" class="text-center"><a href="{{obj.get_absolute_url}}" class="stretched-link">{{obj.pk}}</a></th>
+            <th scope="row" class="text-center">
+              <a href="{{obj.get_absolute_url}}" class="stretched-link">{{obj.id_instance}}
+              </a>
+            </th>
             <td>{{obj.name|truncatechars:100}}</td>
             <td class="text-center">{{obj.time_create|date:"d-m-Y H:i:s"}}</td>
             <td class="text-center">

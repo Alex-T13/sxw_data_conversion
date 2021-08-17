@@ -7,6 +7,7 @@ User = get_user_model()
 
 
 class BuildingObject(models.Model):
+    id_instance = models.IntegerField(default=0, )
     name = models.CharField(max_length=255, db_index=True, verbose_name='Название объекта')
     base = models.CharField(max_length=10, default='2017г.', verbose_name='База расценок')
     time_create = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
