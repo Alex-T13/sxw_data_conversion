@@ -37,7 +37,7 @@ development:
   WEB_CONCURRENCY: 1
 
 heroku:
-  HOST: "sxw_data_conversion.herokuapp.com"
+  HOST: "sxw-data-conversion.herokuapp.com"
   MODE_DEBUG: false
   REQUEST_TTL: 10
   VENV_SYNTHETIC: true
