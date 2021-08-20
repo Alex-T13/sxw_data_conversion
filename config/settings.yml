@@ -38,6 +38,6 @@ development:
 
 heroku:
   HOST: "sxw-data-conversion.herokuapp.com"
-  MODE_DEBUG: true
+  MODE_DEBUG: false
   REQUEST_TTL: 10
   VENV_SYNTHETIC: true
