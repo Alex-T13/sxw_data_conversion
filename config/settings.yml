@@ -19,7 +19,7 @@ default:
   MODE_DEBUG: true
   MODE_PROFILING: false
   PORT: 8000
-  PROJECT_NAME: "sinkevich_data_conv"
+  PROJECT_NAME: "sxw_data_conversion"
   REQUEST_TTL: 0
 
   SENTRY_DSN: ""
@@ -37,7 +37,7 @@ development:
   WEB_CONCURRENCY: 1
 
 heroku:
-  HOST: "sinkevich-data-conv.herokuapp.com"
+  HOST: "sxw_data_conversion.herokuapp.com"
   MODE_DEBUG: false
   REQUEST_TTL: 10
   VENV_SYNTHETIC: true
