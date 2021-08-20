@@ -133,8 +133,8 @@ STATICFILES_DIRS = [
     DIR_PROJECT / "static",
 ]
 
-# if not DEBUG:
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+if not DEBUG:
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 MEDIA_ROOT = DIR_REPO / '.media'
