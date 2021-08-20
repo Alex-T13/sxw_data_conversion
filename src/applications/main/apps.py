@@ -223,7 +223,7 @@ class FileXML:
         return True
 
     def __add_xml_str_footer(self) -> bool:
-        file_path_footer_part = f"{settings.MEDIA_ROOT}/_footer_part.txt"
+        file_path_footer_part = f"{settings.STATIC_ROOT}/main/text/_footer.part"
         try:
             with open(f"{file_path_footer_part}", "r") as f_footer_part:
                 self.__xml_string += f_footer_part.read()

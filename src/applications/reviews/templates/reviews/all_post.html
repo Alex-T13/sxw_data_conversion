@@ -21,14 +21,19 @@
         </div>
       </div>
     </form>
+  {% else %}
+    <div class="row mb-3">
+      <div class="col-sm">
+        В данный момент Вы не можете оставлять сообщения. Для этого Вам нужно <a href="{% url 'login' %}">войти</a>
+        или <a href="{% url 'register' %}">зарегистрироваться.</a>
+      </div>
+    </div>
   {% endif %}
   {% if object_list%}
     {% for obj in object_list %}
       <div class="container">
         <div class="row">
-          <div class="col-3">
-
-          </div>
+          <div class="col-3"></div>
           <div class="col text-end">
             <small>
               {{obj.author|truncatechars:20}} | {{obj.create|date:"d-m-Y H:i:s"}}
@@ -46,7 +51,7 @@
           <div class="col-9">
             <br>
             {% if obj.content|length > 250 %}
-                <a class="btn btn-outline-primary btn-sm" href="{% url 'post' obj.id %}" role="button">Весь пост</a>
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'post' obj.id %}" role="button">Показать весь</a>
             {% endif %}
             {% if obj.author == user %}
               <a class="btn btn-outline-success btn-sm" href="{% url 'update_post' obj.id %}" role="button">Редактировать</a>

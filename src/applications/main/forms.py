@@ -103,8 +103,3 @@ class SelectBuildObjectForm(forms.Form):
 
 
 # ------------------- validators ---------------------
-
-# def validate_comment_word_count(value):
-#     count = len(value.split())
-#     if count < 30:
-#         raise forms.ValidationError(('Please provide at '), params={'count': count},)

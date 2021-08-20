@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.urls import path, include
-# from applications.main.views import pageNotFound
 
 
 urlpatterns = [
@@ -10,4 +9,3 @@ urlpatterns = [
     path('reviews/', include('applications.reviews.urls')),
 ]
 
-# handler404 = pageNotFound

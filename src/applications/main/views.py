@@ -4,9 +4,9 @@ from typing import Dict
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Sum
-from django.http import HttpResponseNotFound, HttpResponse, Http404
+from django.http import HttpResponse, Http404
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, FormView
+from django.views.generic import ListView, CreateView, FormView, TemplateView, RedirectView
 
 from applications.main.apps import FileXML
 from applications.main.forms import AddBuildObjectForm, AddMaterialsForm, SelectBuildObjectForm
@@ -15,7 +15,18 @@ from framework.custom_logging import logger
 from framework.mixins import ExtendedDataContextMixin
 
 
-class MainHomeView(ExtendedDataContextMixin, ListView):
+class MainView(RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            self.url = 'list_objects'
+        else:
+            self.url = 'about'
+        url = super(MainView, self).get_redirect_url()
+        return url
+
+
+class ListObjectsView(ExtendedDataContextMixin, ListView):
     model = BuildingObject
     template_name = 'main/index.html'
 
@@ -35,7 +46,7 @@ class MainHomeView(ExtendedDataContextMixin, ListView):
         return context
 
 
-class ShowBuildingObjectView(LoginRequiredMixin, ExtendedDataContextMixin, ListView):
+class ShowBuildObjectView(LoginRequiredMixin, ExtendedDataContextMixin, ListView):
     model = ConstructionMaterial
     login_url = reverse_lazy('login')
     template_name = 'main/object.html'
@@ -213,8 +224,26 @@ def download_xml(request):
             response['Content-Disposition'] = f"attachment; filename= {os.path.basename(file_path)}"
             return response
     logger.debug("Directory or file does not exist")
-    return HttpResponseNotFound
+    return Http404("Страница не найдена")  # HttpResponseNotFound
 
 
-# def pageNotFound(request, exception):
-#     return HttpResponseNotFound('<h1>Страница не найдена</h1>')
+class AboutView(ExtendedDataContextMixin, TemplateView):
+    template_name = 'main/about.html'
+
+    def get_extended_context(self) -> Dict:
+        context = {
+            'mainmenu_selected': "О сайте",
+            'title': "О сайте"
+        }
+        return context
+
+
+class HelpView(ExtendedDataContextMixin, TemplateView):
+    template_name = 'main/help.html'
+
+    def get_extended_context(self) -> Dict:
+        context = {
+            'mainmenu_selected': "Помощь",
+            'title': "Справочная информация.",
+        }
+        return context

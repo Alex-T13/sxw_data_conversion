@@ -17,7 +17,7 @@ class ShowPostView(LoginRequiredMixin, ExtendedDataContextMixin, DetailView):
 
     def get_extended_context(self) -> Dict:
         context = {
-            'title': 'Детализация поста',
+            'title': 'Детализация сообщения',
         }
         return context
 
@@ -60,6 +60,6 @@ class UpdatePostView(LoginRequiredMixin, ExtendedDataContextMixin, UpdateView):
 
     def get_extended_context(self) -> Dict:
         context = {
-            'title': "Редактирование поста",
+            'title': "Редактирование сообщения",
         }
         return context

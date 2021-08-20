@@ -20,7 +20,7 @@
         {% block mainmenu %}
           <header class="d-flex justify-content-center py-3 mb-4 border-bottom">
             <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto">
-              <span class="fs-4">Привет всем!</span>
+              <span class="fs-4">SXW© Data Conversion</span>
             </div>
             <ul class="nav nav-pills">
               {% for m in mainmenu %}
@@ -75,7 +75,10 @@
             {% block content %}
             {% endblock %}
           </div>
-          <div class="col-2"></div>
+          <div class="col-2">
+            {% block additional_content %}
+            {% endblock additional_content %}
+          </div>
         </div>
       </div>
     </div>

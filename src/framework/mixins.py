@@ -4,7 +4,8 @@ from typing import Dict
 from framework.custom_logging import logger
 
 menu_h = [
-    {'title': 'Объекты', 'url_name': 'main'},
+    {'title': 'Объекты', 'url_name': 'list_objects'},
+    {'title': 'О сайте', 'url_name': 'about'},
     {'title': 'Помощь', 'url_name': 'help'},
     {'title': 'Отзывы и предложения', 'url_name': 'reviews'},
     {'title': 'Выйти', 'url_name': 'logout'},
@@ -24,12 +25,11 @@ menu_v = [
 class ExtendedDataContextMixin(abc.ABC):
     def get_context_data(self, *args, **kwargs) -> Dict:
         context = super().get_context_data()
-        # user_menu_h = []
         if self.request.user.is_authenticated:
             user_menu_h = menu_h[0:-2]
             context['leftmenu'] = menu_v
         else:
-            user_menu_h = menu_h[0:3] + menu_h[-2:]
+            user_menu_h = menu_h[0:4] + menu_h[-2:]
         context['mainmenu'] = user_menu_h
         extended_context = self.get_extended_context()
         context = {**context, **extended_context}
