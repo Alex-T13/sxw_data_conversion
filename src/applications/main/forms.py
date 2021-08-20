@@ -1,7 +1,7 @@
 from django import forms
 
 from applications.main.apps import UploadedFileObject
-from applications.main.models import BuildingObject
+from applications.main.models import BuildingObject, ConstructionMaterial
 from framework.custom_logging import logger
 
 
@@ -23,6 +23,8 @@ class AddBuildObjectForm(forms.ModelForm):
         self.request = kwargs.pop("request")
         super(AddBuildObjectForm, self).__init__(*args, **kwargs)
         self.instance.user = self.request.user
+        count_obj_db = int(BuildingObject.objects.filter(user__id=self.instance.user.id).count())
+        self.instance.id_instance = count_obj_db + 1
         logger.debug(f"self.instance.user: {self.instance.user}")
 
     def clean(self):
@@ -67,12 +69,16 @@ class AddMaterialsForm(forms.Form):
             raise forms.ValidationError("""Файл не загружается. С ним что-то не так. Обратитесь к разделу 'Помощь'
                                         или оставьте сообщение в разделе 'Отзывы и предложения'""", code='key_error')
 
+        if ConstructionMaterial.objects.filter(building_object__user__id=self.request.user.id).count() >= 2000:
+            raise forms.ValidationError("Вы больше не можете добавлять материалы. Вы достигли максимального количества.",
+                                        code='overflow')
+
         object_id = self.cleaned_data['b_object'].id
-        file = UploadedFileObject(data)
+        file = UploadedFileObject(data, object_id)
 
         if not file.check_row_0():
             raise forms.ValidationError("Структура файла не соответствует шаблону. Смотрите справку.", code='index')
-        if not file.create_obj_list(object_id):
+        if not file.create_obj_list():
             raise forms.ValidationError("""Данные в файле заполнены не верно. Возможно есть пропущенные пустые ячейки.
                                         Обратитесь к разделу 'Помощь'. (Попробуйте удалить несколько пустых строк в 
                                         конце файла или создать новый файл и скопировать данные в него.)""",
@@ -95,9 +101,5 @@ class SelectBuildObjectForm(forms.Form):
         super(SelectBuildObjectForm, self).__init__(*args, **kwargs)
         self.fields['b_object'].queryset = BuildingObject.objects.filter(user__id=self.request.user.id)
 
-# ------------------- validators ---------------------
 
-# def validate_comment_word_count(value):
-#     count = len(value.split())
-#     if count < 30:
-#         raise forms.ValidationError(('Please provide at '), params={'count': count},)
+# ------------------- validators ---------------------

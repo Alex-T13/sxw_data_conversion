@@ -15,7 +15,10 @@
       <tbody>
         {% for obj in object_list %}
           <tr style="transform: rotate(0);">
-            <th scope="row" class="text-center"><a href="{{obj.get_absolute_url}}" class="stretched-link">{{obj.pk}}</a></th>
+            <th scope="row" class="text-center">
+              <a href="{{obj.get_absolute_url}}" class="stretched-link">{{obj.id_instance}}
+              </a>
+            </th>
             <td>{{obj.name|truncatechars:100}}</td>
             <td class="text-center">{{obj.time_create|date:"d-m-Y H:i:s"}}</td>
             <td class="text-center">
@@ -31,12 +34,13 @@
     </table>
   {% endif %}
 {% else %}
-  <h2>В данный момент Вы не аутетифицированы, как пользователь данного сайта.</h2>
-  <h3>Пожалуйста войдите или зарегистрируйтесь.</h3>
+  <p>В данный момент Вы не аутентифицированы, как пользователь данного сайта.</p>
+  <h6>Пожалуйста, <a href="{% url 'login' %}">войдите</a> или <a href="{% url 'register' %}">зарегистрируйтесь.</a></h6>
   <hr>
   <h5>Вы можете посетить следующие страницы:</h5>
   <br>
   <ul>
+    <li><a href="{% url 'about' %}">О сайте</a></li>
     <li><a href="{% url 'help' %}">Помощь</a></li>
     <li><a href="{% url 'reviews' %}">Отзывы и предложения</a></li>
     <li><a href="{% url 'register' %}">Регистрация</a></li>
