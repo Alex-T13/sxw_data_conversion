@@ -70,7 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.media',
+                # 'django.template.context_processors.media',
             ],
         },
     },
@@ -133,8 +133,9 @@ STATICFILES_DIRS = [
     DIR_PROJECT / "static",
 ]
 
-if not DEBUG:
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# if not DEBUG:
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 MEDIA_ROOT = DIR_REPO / '.media'
 MEDIA_URL = '/media/'

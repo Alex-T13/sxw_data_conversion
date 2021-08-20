@@ -6,7 +6,6 @@ default:
     - .pytest_cache
     - .static
     - .tests_artifacts
-    - .media
   DIRS_RESOURCES:
     - config
     - src/project/static/
@@ -15,6 +14,7 @@ default:
   DIRS_TEMPLATES:
     - src/applications/main/templates/
     - src/applications/auth_reg/templates/
+    - src/applications/reviews/templates/
   HOST: ""
   MODE_DEBUG: true
   MODE_PROFILING: false
@@ -38,6 +38,6 @@ development:
 
 heroku:
   HOST: "sxw-data-conversion.herokuapp.com"
-  MODE_DEBUG: true
+  MODE_DEBUG: false
   REQUEST_TTL: 10
   VENV_SYNTHETIC: true
